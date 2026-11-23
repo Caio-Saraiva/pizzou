@@ -767,3 +767,24 @@ export const messages = {
     }
   }
 };
+
+// Compact dietary controls shared by setup, voting and the receipt.
+const dietaryMessages = {
+  'pt-BR': ['Veggie/vegan', 'Toque no sabor para marcar', 'Sou veggie/vegan', 'Marque ao menos um sabor veggie/vegan para continuar.', 'Editar sabores', 'Pizzas veggie/vegan separadas. Confirme os ingredientes e o preparo com a pizzaria.'],
+  en: ['Veggie/vegan', 'Tap a flavor to mark it', 'I’m veggie/vegan', 'Mark at least one veggie/vegan flavor to continue.', 'Edit flavors', 'Veggie/vegan pizzas kept separate. Confirm ingredients and preparation with the pizzeria.'],
+  fr: ['Végé/végan', 'Touchez une saveur pour la marquer', 'Je suis végé/végan', 'Marquez au moins une saveur végé/végan pour continuer.', 'Modifier les saveurs', 'Pizzas végé/végan séparées. Confirmez les ingrédients et la préparation avec la pizzeria.'],
+  es: ['Veggie/vegano', 'Toca un sabor para marcarlo', 'Soy veggie/vegano', 'Marca al menos un sabor veggie/vegano para continuar.', 'Editar sabores', 'Pizzas veggie/veganas separadas. Confirma los ingredientes y la preparación con la pizzería.'],
+  zh: ['素食/纯素', '点击口味以标记', '我是素食/纯素者', '请至少标记一种素食/纯素口味后再继续。', '编辑口味', '素食/纯素披萨分开搭配。请与披萨店确认食材和制作方式。'],
+};
+for (const [lang, values] of Object.entries(dietaryMessages)) {
+  ['veggie', 'veggieHint', 'veggiePerson', 'veggieMissing', 'editFlavors', 'veggieNote'].forEach((key, i) => messages[lang].flavor[key] = values[i]);
+}
+
+const dietaryMethods = {
+  'pt-BR': 'Com a folhinha, reservamos pelo menos uma pizza veggie/vegan. Somamos a fome de quem se identifica assim e de quem coloca um sabor marcado em primeiro lugar, arredondando para pizzas inteiras. Dentro de cada grupo, apuramos os rankings compatíveis; se todo o pedido for veggie/vegan, todos participam desse ranking. Os grupos são montados separadamente.',
+  en: 'A leaf reserves at least one veggie/vegan pizza. We add the appetite of restricted voters and anyone ranking a marked flavor first, rounding up to whole pizzas. Compatible rankings are counted within each pool; if the whole order is veggie/vegan, everyone participates in that pool. Pools are packed separately.',
+  fr: 'Une feuille réserve au moins une pizza végé/végan. Nous additionnons la faim des personnes concernées et de celles plaçant une saveur marquée en premier, puis arrondissons aux pizzas entières. Les classements compatibles sont comptés par groupe ; si toute la commande est végé/végan, tout le monde y participe. Les groupes restent séparés.',
+  es: 'La hoja reserva al menos una pizza veggie/vegana. Sumamos el hambre de quienes se identifican así y de quienes ponen un sabor marcado primero, redondeando a pizzas enteras. Contamos las preferencias compatibles dentro de cada grupo; si todo el pedido es veggie/vegano, participan todos. Los grupos se montan por separado.',
+  zh: '标记叶子后至少保留一张素食/纯素披萨。将有饮食限制者及首选已标记口味者的食量相加，向上取整为完整披萨。各组按兼容口味排名计票；若全部披萨均为素食/纯素，则所有人参与该组计票。两组分开搭配。',
+};
+for (const [lang, text] of Object.entries(dietaryMethods)) messages[lang].flavor.dietaryMethod = text;

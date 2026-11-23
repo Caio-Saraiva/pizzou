@@ -7,7 +7,7 @@ export function seededShuffle(values, seed) {
   return out;
 }
 export function allocateFlavors(ballots, ids, pizzaCount, parts, seed = 1, ballotWeights = ballots.map(() => 1)) {
-  if (!Array.isArray(ids) || ids.length < 2 || ids.length > 12 || new Set(ids).size !== ids.length || !ids.every(id => typeof id === 'string') ||
+  if (!Array.isArray(ids) || ids.length < 1 || ids.length > 12 || new Set(ids).size !== ids.length || !ids.every(id => typeof id === 'string') ||
       !Array.isArray(ballots) || ballots.length < 1 || ballots.length > 50 || !Number.isSafeInteger(pizzaCount) || !Number.isSafeInteger(pizzaCount * parts) || pizzaCount < 1 || ![1, 2, 3, 4].includes(parts) ||
       !ballots.every(b => Array.isArray(b) && b.length === ids.length && new Set(b).size === ids.length && b.every(id => ids.includes(id)))) throw Error('Invalid election');
   if (!Array.isArray(ballotWeights) || ballotWeights.length !== ballots.length || !ballotWeights.every(w => Number.isFinite(w) && w > 0) || !Number.isFinite(ballotWeights.reduce((sum, w) => sum + w, 0))) throw Error('Invalid ballot weights');
@@ -82,3 +82,32 @@ export function fraction(units, parts) {
   return `${units / d}/${parts / d}`;
 }
 export const escapeHtml = value => String(value).replace(/[&<>"']/g, char => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[char]));
+
+// First reserve whole pizzas by dietary demand, then count preferences inside
+// each compatible pool. Appetite is assigned by the first compatible choice;
+// an otherwise unsupported mandatory veggie pizza uses everyone’s veggie ranking.
+export function allocateDietaryFlavors(ballots, flavors, pizzaCount, parts, seed, weights, dietary, slices) {
+  const ids = flavors.map(f => f.id);
+  const baseline = allocateFlavors(ballots, ids, pizzaCount, parts, seed, weights);
+  if (!Array.isArray(dietary) || dietary.length !== ballots.length || !dietary.every(v => typeof v === 'boolean') ||
+      !Number.isSafeInteger(slices) || slices < 1 || weights.reduce((sum, w) => sum + w, 0) > pizzaCount * slices) throw Error('Invalid dietary demand');
+  const veg = flavors.filter(f => f.veggie).map(f => f.id), other = ids.filter(id => !veg.includes(id));
+  if (!veg.length) {
+    if (dietary.some(Boolean)) throw Error('Missing veggie flavors');
+    return baseline;
+  }
+  const prefersVeg = ballots.map((ranking, i) => dietary[i] || veg.includes(ranking[0]));
+  const vegDemand = weights.reduce((sum, w, i) => sum + (prefersVeg[i] ? w : 0), 0);
+  const vegCount = other.length && !prefersVeg.every(Boolean) ? Math.min(pizzaCount, Math.max(1, Math.ceil(vegDemand / slices))) : pizzaCount;
+  const allocations = [], rounds = [], pizzas = [], tieOrder = [];
+  for (const [pool, count, isVeg] of [[veg, vegCount, true], [other, pizzaCount - vegCount, false]]) {
+    if (!count) continue;
+    let voters = ballots.map((_, i) => i).filter(i => prefersVeg[i] === isVeg);
+    // A rounded-up shared order can consist entirely of veggie pizzas.
+    if (count === pizzaCount || !voters.length) voters = ballots.map((_, i) => i).filter(i => isVeg || !dietary[i]);
+    const plan = allocateFlavors(voters.map(i => ballots[i].filter(id => pool.includes(id))), pool, count, parts, seed, voters.map(i => weights[i]));
+    allocations.push(...plan.allocations); rounds.push(...plan.rounds); pizzas.push(...plan.pizzas); tieOrder.push(...plan.tieOrder);
+  }
+  return {...baseline, allocations, rounds, pizzas, tieOrder, quota: null, veggiePizzaCount: vegCount,
+    dietary: [...dietary], veggieDemand: weights.reduce((sum, w, i) => sum + (dietary[i] ? w : 0), 0)};
+}

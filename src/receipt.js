@@ -16,8 +16,9 @@ export async function createReceipt(state,result,t){
     if(line)lines.push(line);return lines;
   }
   const plan=result.flavorPlan;
-  const names=plan?Object.fromEntries(plan.flavors.map(x=>[x.id,x.name])):{};
+  const names=plan?Object.fromEntries(plan.flavors.map(x=>[x.id,`${x.name}${x.veggie ? ` [${t.flavor.veggie}]` : ''}`])):{};
   const groups=plan?plan.pizzas.map(group=>({title:`${group.count} × ${t.sizeNames[state.size]}`,lines:group.portions.flatMap(p=>wrap(`${fraction(p.units,plan.parts)} ${names[p.id]}`.trim()))})):result.items.map(item=>({title:`${item.count} × ${t.sizeNames[item.id]}`,lines:[`${item.slices} ${t.slices}`]}));
+  if(plan?.veggiePizzaCount) groups.push({title:t.flavor.veggie,lines:wrap(t.flavor.veggieNote)});
   const orderTop=plan?350:334;
   const orderHeight=Math.max(72,groups.reduce((sum,g)=>sum+32+g.lines.length*22+16,0));
   const divider=orderTop+orderHeight+12,totalY=divider+36,footerLine=totalY+88;

@@ -10,9 +10,10 @@
 
 - Escolher um tamanho por pedido: broto, normal ou grande.
 - Definir quantas fatias significam **pouca fome**, **fome normal** e **muita fome** para o seu grupo.
-- Configurar de 1 a 50 pessoas, com fome individual.
+- Começar com a lista vazia e adicionar até 50 pessoas, com fome individual.
 - Calcular pizzas inteiras suficientes para a fome estimada, mostrando as sobras.
 - Votar em até 12 sabores e dividir pizzas em **inteiras, metades, terços ou quartos**.
+- Marcar sabores e votantes **veggie/vegan**, reservar quantidade pela fome e montar pizzas sem misturar os dois grupos.
 - Ver as pizzas do mesmo sabor próximas umas das outras, inclusive quando parte do sabor está em uma pizza mista.
 - Exportar uma notinha PNG com as quantidades, referências de fome e sabores escolhidos.
 - Alternar entre português brasileiro, inglês, francês, espanhol e chinês simplificado, além dos temas claro e escuro.
@@ -64,6 +65,10 @@ Toque em **Escolher pessoas**.
 
 ### 3. Monte a galera
 
+A lista começa **vazia**, inclusive ao tocar em **Recomeçar**. O **+ central**, indicado por uma seta animada, adiciona a primeira pessoa. Calcular fica indisponível enquanto não houver ninguém. Grupos já salvos no navegador continuam preservados.
+
+<img src="docs/screenshots/new-17-empty-people.png" width="360" alt="Lista vazia com botão de adicionar no centro e seta indicando o toque">
+
 Use **− / +** ou digite a quantidade de pessoas. Toque no cartão de cada pessoa para alternar entre pouca fome, fome normal e muita fome. A legenda abaixo mostra os valores configurados no passo anterior.
 
 <img src="docs/screenshots/new-03-people.png" width="360" alt="Quantidade de pessoas e cartões individuais para escolher a fome">
@@ -91,6 +96,10 @@ Escolha a menor porção que a pizzaria permite:
 
 <img src="docs/screenshots/new-05-thirds.png" width="360" alt="Cadastro de sabores e quatro divisões, com terços selecionados">
 
+Toque no cartão de um sabor, fora do **X**, para alternar a marcação **veggie/vegan**. A borda verde e a folhinha mostram a seleção; o X continua apenas removendo. O controle também funciona pelo teclado. A marcação é manual: considere os ingredientes que a galera pode consumir.
+
+<img src="docs/screenshots/new-18-veggie-flavors.png" width="360" alt="Sabores marcados com borda verde e folhinha no tema escuro">
+
 A divisão dos **sabores** é independente da quantidade de **fatias** usada no cálculo de fome. Uma pizza normal de 8 fatias pode ser alocada em três sabores se a pizzaria aceitar essa divisão; o app não tenta representar cada fatia como um voto.
 
 Toque em **Começar votação**.
@@ -101,7 +110,9 @@ Antes do **primeiro voto** e entre todas as pessoas, a tela mostra uma carinha g
 
 <img src="docs/screenshots/new-16-first-voter.png" width="360" alt="Identificação antes do primeiro voto: Pessoa 01, pouca fome, peso de 3 fatias">
 
-Coloque o sabor favorito no topo. Arraste pela alça ou toque nos botões de subir e descer. Todos os sabores devem estar ordenados; a ordem inicial é embaralhada para cada pessoa.
+Coloque o sabor favorito no topo. Arraste pela alça ou toque nos botões de subir e descer. A ordem inicial é embaralhada para cada pessoa. Antes ou durante o voto, toque em **Sou veggie/vegan** para identificar a restrição daquela pessoa. O ranking passa a mostrar apenas os sabores com folhinha; as demais pessoas podem votar em todos os sabores. Se nenhum sabor compatível estiver marcado, confirmar fica bloqueado e **Editar sabores** volta ao cadastro, reiniciando os votos e preservando as marcações das pessoas.
+
+<img src="docs/screenshots/new-19-veggie-vote.png" width="360" alt="Pessoa veggie/vegan votando apenas nos sabores compatíveis">
 
 <img src="docs/screenshots/new-06-vote.png" width="360" alt="Ranking individual de sabores com controles de ordenação">
 
@@ -118,6 +129,10 @@ O **peso do voto corresponde às fatias configuradas para a fome daquela pessoa*
 O resultado conserva a quantidade calculada de pizzas, monta inteiras quando possível e reúne as frações restantes em pizzas mistas. As pizzas com sabores em comum ficam próximas: por exemplo, uma pizza inteira de Margherita aparece junto da pizza com a fração restante de Margherita.
 
 <img src="docs/screenshots/new-08-flavors.png" width="360" alt="Resultado ponderado pela fome com duas pizzas de Calabresa e uma pizza mista em terços">
+
+Com sabores veggie/vegan, a montagem mantém as pizzas desse grupo separadas das demais em qualquer divisão, sem misturar os grupos na mesma pizza. A folhinha e a borda verde também aparecem no resultado.
+
+<img src="docs/screenshots/new-20-veggie-order.png" width="360" alt="Pedido com pizzas veggie/vegan separadas das demais">
 
 A mesma ordem é usada na notinha. Na captura acima, as duas pessoas com muita fome preferiram Calabresa e receberam duas pizzas desse sabor; as preferências das pessoas com pouca fome aparecem na pizza mista. **Como os sabores foram escolhidos?** mostra as rodadas e a ordem de desempate. **Refazer votação** mantém os sabores e a divisão, mas limpa os votos.
 
@@ -192,6 +207,28 @@ O sistema usa votação por preferências com uma adaptação proporcional para 
 
 Exemplo de proporcionalidade: duas pessoas apoiam A com pesos 3 e 5, e uma apoia B com peso 7. Em 15 porções, a cota é 1 e a distribuição fica **8 porções de A e 7 de B**. Cada porção consome apoio; o mesmo peso não é reutilizado integralmente nas rodadas seguintes. Multiplicar todos os pesos pela mesma constante não muda essa distribuição.
 
+#### Reserva veggie/vegan
+
+Quando há sabores com folhinha, a apuração acontece em dois grupos:
+
+1. A fome das pessoas veggie/vegan e das pessoas sem restrição que colocaram um sabor marcado em primeiro lugar forma a demanda veggie/vegan.
+2. Reservamos `teto(demanda veggie / fatias por pizza)` pizzas inteiras desse grupo, com mínimo de **uma pizza** quando existe algum sabor marcado e máximo igual ao total do pedido. Se todos preferem esse grupo ou o menu inteiro é marcado, todas as pizzas são veggie/vegan.
+3. Cada pessoa participa da apuração do grupo de sua primeira preferência compatível, com o peso da sua fome. Dentro dele, usamos seu ranking filtrado. Se o pedido inteiro ficar veggie/vegan, todos votam nesse grupo. Se a reserva mínima existir sem apoiadores iniciais, os rankings veggie/vegan de todos escolhem essa pizza.
+4. As demais pizzas seguem os rankings das pessoas sem restrição que preferiram sabores não marcados. A montagem de inteiras, duplas, triplas e quartetos acontece separadamente por grupo, conservando todas as porções e o total calculado.
+
+Exemplo: uma pessoa veggie/vegan com fome de 7 fatias e outra sem restrição com fome de 3 precisam de duas pizzas normais. Pelo menos uma será inteiramente veggie/vegan, mesmo se a outra pessoa preferir carne. Se o pedido couber em uma única pizza, ela será totalmente veggie/vegan, e a pessoa sem restrição também participa da escolha entre os sabores compatíveis.
+
+A marcação única reúne veggie e vegan; cabe ao grupo marcar somente sabores compatíveis com seus ingredientes. O app separa a montagem do pedido; os ingredientes e o preparo separado precisam ser confirmados com a pizzaria. Essa orientação e os rótulos acompanham a notinha exportada.
+
+<details>
+<summary>Pedido no tema escuro e notinha com identificação veggie/vegan</summary>
+
+![Pizzas separadas no desktop escuro](docs/screenshots/new-21-veggie-dark.png)
+
+<img src="docs/screenshots/new-22-veggie-receipt.png" width="600" alt="Notinha exportada identificando sabores veggie/vegan e solicitando preparo separado">
+
+</details>
+
 A inspiração é o voto preferencial australiano. A ponderação pela fome, a cota por porção e a possibilidade de repetir um sabor são adaptações do pizzou; o sistema não reproduz integralmente as regras eleitorais do Senado australiano.
 
 Referências: [AEC — voto preferencial](https://www.aec.gov.au/learn/preferential-voting.htm) e [AEC — contagem do Senado](https://www.aec.gov.au/Voting/counting/senate_count.htm).
@@ -200,7 +237,7 @@ Referências: [AEC — voto preferencial](https://www.aec.gov.au/learn/preferent
 
 - Tamanho, referências de fome, pessoas, idioma e tema ficam no `localStorage` do navegador, na chave `pizzou-v2`.
 - Preferências antigas são migradas. Dados inválidos de fome voltam a 3 / 5 / 7.
-- Rankings e votos ficam somente na memória da aba. Recarregar a página perde a votação.
+- Sabores, marcações veggie/vegan, rankings e votos ficam somente na memória da aba. Recarregar a página perde a votação.
 - Fechar e reabrir o diálogo de sabores preserva a sessão enquanto o pedido não mudar.
 - Alterar tamanho, quantidade de pessoas, fome individual ou suas referências limpa o resultado de sabores.
 - A notinha é gerada localmente com Canvas; os dados não são enviados a um servidor.
@@ -279,7 +316,7 @@ src/
 public/               Fontes, favicon e arte de compartilhamento
 scripts/              Gerador da arte social em SVG
 tests/                Testes de cálculo, persistência e votação
-docs/screenshots/     16 capturas reais do fluxo e da exportação
+docs/screenshots/     22 capturas reais do fluxo e da exportação
 server.mjs            Servidor estático de produção
 ```
 
@@ -290,15 +327,19 @@ npm test
 npm run build
 ```
 
-Os **26 testes automatizados** cobrem:
+Os **33 testes automatizados** cobrem:
 
+- Inicialização e persistência de lista vazia, preservando grupos existentes.
+- Reserva pela fome, votos sem restrição em sabores veggie/vegan, pedido de uma pizza, menu totalmente marcado, falta de opção compatível e separação dos grupos nas quatro divisões.
 - Cálculo nos três tamanhos, até 50 pessoas, níveis individuais e grupos mistos.
 - Referências personalizadas, cascatas nos dois sentidos, mínimo 1 / 2 / 3, aumentos acima de 99, ordem estrita, dados inválidos e migração.
 - Transferência de preferências, maioria ponderada, distribuição proporcional, consumo do peso, invariância de escala, pesos inválidos e desempates reproduzíveis.
 - Conservação de porções para inteiras, metades, terços e quartos.
 - Frações 1/3 e 2/3, agrupamento de pizzas inteiras com seus restos e pedidos grandes com referências personalizadas.
 
-A revisão no Chromium incluiu 360×800, 768×1024, 568×320, 844×390, 1280×720 e 1280×900; temas claro/escuro; textos do novo passo nos cinco idiomas; limites dos seletores; persistência; rotação; recálculo; grupo com 50 pessoas; teclado nas quatro divisões; identificação antes do primeiro voto e entre pessoas com fomes distintas; votação ponderada completa em terços; exportação e download do PNG. As capturas publicadas estão em `docs/screenshots/`. Evidências adicionais e arquivos temporários em `output/` ficam fora do Git.
+A revisão desta mudança no Chromium conferiu 360×800, 768×1024 e 1280×900 nos temas claro e escuro, além da votação em 844×390; lista vazia, adição central, remoção até zero após cálculo, persistência, marcação pelo teclado, X independente, restrição individual, bloqueio sem sabor compatível, volta ao cadastro, votação completa e exportação PNG. Capturas atualizadas: `new-17` a `new-22`.
+
+A revisão anterior no Chromium incluiu 360×800, 768×1024, 568×320, 844×390, 1280×720 e 1280×900; temas claro/escuro; textos do novo passo nos cinco idiomas; limites dos seletores; persistência; rotação; recálculo; grupo com 50 pessoas; teclado nas quatro divisões; identificação antes do primeiro voto e entre pessoas com fomes distintas; votação ponderada completa em terços; exportação e download do PNG. As capturas publicadas estão em `docs/screenshots/`. Evidências adicionais e arquivos temporários em `output/` ficam fora do Git.
 
 Compartilhamento nativo com aplicativos instalados e gestos em aparelhos físicos dependem do sistema e ainda precisam de verificação em dispositivos reais. O download alternativo foi validado no Chromium.
 

@@ -60,10 +60,16 @@ function sizeScreen(l) {
     <div class="size-grid" role="radiogroup" aria-labelledby="sizes-heading">${SIZES.map(size => `<button class="size-card ${state.size === size.id ? 'selected' : ''}" role="radio" aria-checked="${state.size === size.id}" tabindex="${state.size === size.id ? 0 : -1}" data-action="size" data-value="${size.id}"><span class="selection-check">${icon('check')}</span><span class="size-art ${size.id}">${pizza(size.slices)}</span><strong>${l.sizeNames[size.id]}</strong><span>${slicesText(size.slices)}</span></button>`).join('')}</div>
   </section>`;
 }
+function peopleMarkup() {
+  return state.people.length ? state.people.map(personMarkup).join('') : `<div class="people-empty"><span class="people-empty-arrow" aria-hidden="true">${icon('down')}</span><button class="people-empty-add" data-action="add" aria-label="${t().add}">${icon('plus')}</button><span>${t().add}</span></div>`;
+}
+function syncCalculateButtons() {
+  document.querySelectorAll('[data-action="calculate"]').forEach(button => button.disabled = !state.people.length);
+}
 function peopleScreen(l, showSize = true) {
   return `${showSize ? `<div class="chosen-size"><button data-action="step" data-value="0" aria-label="${l.edit}: ${l.sizeNames[state.size]}">${pizza(chosenSize().slices)}<strong>${l.sizeNames[state.size]}</strong><span>${slicesText(chosenSize().slices)}</span><span class="change-size">${l.edit}</span></button></div>` : ''}
-    <section class="panel people-panel" aria-labelledby="people-heading"><div class="section-heading"><h2 id="people-heading">${l.people}</h2><div class="stepper"><button data-action="remove" class="step-button" aria-label="${l.remove}" ${state.people.length === 1 ? 'disabled' : ''}>${icon('minus')}</button><input class="people-count" aria-label="${l.peopleUnit}" type="text" inputmode="numeric" pattern="[0-9]*" maxlength="2" value="${state.people.length}" /><button data-action="add" class="step-button" aria-label="${l.add}" ${state.people.length === 50 ? 'disabled' : ''}>${icon('plus')}</button></div></div>
-    <p class="section-hint">${icon('reset')} ${l.tap}</p><div class="people-grid">${state.people.map(personMarkup).join('')}</div>
+    <section class="panel people-panel" aria-labelledby="people-heading"><div class="section-heading"><h2 id="people-heading">${l.people}</h2><div class="stepper"><button data-action="remove" class="step-button" aria-label="${l.remove}" ${state.people.length === 0 ? 'disabled' : ''}>${icon('minus')}</button><input class="people-count" aria-label="${l.peopleUnit}" type="text" inputmode="numeric" pattern="[0-9]*" maxlength="2" value="${state.people.length}" /><button data-action="add" class="step-button" aria-label="${l.add}" ${state.people.length === 50 ? 'disabled' : ''}>${icon('plus')}</button></div></div>
+    <p class="section-hint">${icon('reset')} ${l.tap}</p><div class="people-grid">${peopleMarkup()}</div>
     <div class="hunger-key">${state.portions.map((n, i) => `<span><i class="key-dot level-${i}"></i><span>${n}</span><span class="portion-unit"> ${l.slices}</span></span>`).join('')}</div></section>`;
 }
 function resultScreen(l) {
@@ -88,6 +94,7 @@ function updateBoardResult(reveal = false) {
   body.innerHTML = boardResultMarkup(t());
   body.setAttribute('aria-busy', String(recalculating));
   document.querySelector('.board-actions').innerHTML = boardActionsMarkup(t());
+  syncCalculateButtons();
   if (reveal && result) animate(body.querySelector('.result-card'), [{opacity:0, transform:'translateY(8px) scale(.98)'},{opacity:1, transform:'translateY(0) scale(1)'}], 360);
 }
 function invalidateResult() {
@@ -95,7 +102,7 @@ function invalidateResult() {
   orderRevision++;
   clearTimeout(recalcTimer);
   result = null;
-  recalculating = boardMode.matches && hasCalculated;
+  recalculating = boardMode.matches && hasCalculated && state.people.length > 0;
   updateBoardResult();
   if (recalculating) {
     // Coalesce rapid edits; an earlier order is never shown as the current result.
@@ -137,6 +144,7 @@ function render({ enter = false, back = false } = {}) {
   } else if (focusAction && ['theme','language','reset','share-app'].includes(focusAction)) document.querySelector(`[data-action="${focusAction}"]`)?.focus({ preventScroll:true });
   const grid = document.querySelector(".people-grid");
   if (grid) grid.scrollTop = listScroll;
+  syncCalculateButtons();
   persist();
 }
 function go(nextStep) {
@@ -150,7 +158,7 @@ function closeLanguages() {
   if (menu && !menu.hidden) { menu.hidden = true; document.querySelector('[data-action="language"]').setAttribute('aria-expanded','false'); }
 }
 function setCount(n) {
-  const count = Math.min(50, Math.max(1, Math.trunc(n) || state.people.length));
+  const count = Math.min(50, Math.max(0, Number.isFinite(n) ? Math.trunc(n) : state.people.length));
   const oldCount = state.people.length;
   document.querySelector(".people-count").value = count;
   if (count === oldCount) return;
@@ -158,11 +166,12 @@ function setCount(n) {
   invalidateResult();
   const grid = document.querySelector('.people-grid');
   const scroll = grid.scrollTop;
-  grid.innerHTML = state.people.map(personMarkup).join('');
+  grid.innerHTML = peopleMarkup();
   grid.scrollTop = scroll;
   document.querySelector('.people-count').value = count;
-  document.querySelector('[data-action="remove"]').disabled = count === 1;
+  document.querySelector('[data-action="remove"]').disabled = count === 0;
   document.querySelector('[data-action="add"]').disabled = count === 50;
+  syncCalculateButtons();
   if (count > oldCount) {
     // Reveal the new person inside the list; the calculate button stays in place.
     grid.scrollTop = grid.scrollHeight;
@@ -252,6 +261,7 @@ app.addEventListener('click', async event => {
   if (action === 'next' && step < 2) go(step + 1);
   if (action === 'calculate' && (boardMode.matches || step === 2)) {
     setCount(Number(document.querySelector('.people-count').value));
+    if (!state.people.length) return;
     clearTimeout(recalcTimer); recalculating = false; hasCalculated = true;
     result = calculate(state.people, state.size, state.portions);
     if (boardMode.matches) updateBoardResult(true); else go(3);
@@ -261,7 +271,7 @@ app.addEventListener('click', async event => {
   if (action === 'theme') { state.theme = state.theme === 'light' ? 'dark' : 'light'; render(); }
   if (action === 'language') { const menu = document.querySelector('#languages'); menu.hidden = !menu.hidden; button.setAttribute('aria-expanded',String(!menu.hidden)); if (!menu.hidden) menu.querySelector('button')?.focus(); }
   if (action === 'locale') { state.lang = value; render(); document.querySelector('[data-action="language"]').focus(); }
-  if (action === 'reset') { flavorPlan = null; flavorFlow.reset(); clearTimeout(recalcTimer); hasCalculated = false; recalculating = false; orderRevision++; state.people = [1,1,1,1]; state.size = 'medium'; state.portions = [...PORTIONS]; go(0); notify(t().resetDone); }
+  if (action === 'reset') { flavorPlan = null; flavorFlow.reset(); clearTimeout(recalcTimer); hasCalculated = false; recalculating = false; orderRevision++; state.people = []; state.size = 'medium'; state.portions = [...PORTIONS]; go(0); notify(t().resetDone); }
   if (action === 'info') document.querySelector('#info-dialog').showModal();
   if (action === 'close') button.closest('dialog').close();
   if (action === 'flavors' && result) flavorFlow.open();

@@ -1,5 +1,6 @@
 export const icon = (name, cls = '') => {
   const paths = {
+    leaf: '<path d="M20 3C8 2 3 7 5 14c2 7 13 7 15-11Z"/><path d="M4 21 15 10"/>',
     calculator: '<rect x="4" y="2" width="16" height="20" rx="3"/><path d="M8 6h8M8 11h1m6 0h1m-8 4h1m6 0h1m-8 4h1m6 0h1"/>',
     grip: '<circle cx="8" cy="5" r="1"/><circle cx="16" cy="5" r="1"/><circle cx="8" cy="12" r="1"/><circle cx="16" cy="12" r="1"/><circle cx="8" cy="19" r="1"/><circle cx="16" cy="19" r="1"/>',
     up: '<path d="m6 15 6-6 6 6"/>', down: '<path d="m6 9 6 6 6-6"/>',

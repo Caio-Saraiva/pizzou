@@ -95,3 +95,9 @@ test('cascade preserves strict order through repeated increases and decreases', 
   for (let n=0; n<1000; n++) portions=adjustPortions(portions,2,portions[2]-1);
   assert.deepEqual(portions,[1,2,3]);
 });
+
+test('fresh, reset and persisted empty groups stay empty', () => {
+  assert.deepEqual(restorePreferences(null).people,[]);
+  assert.deepEqual(restorePreferences({people:[]}).people,[]);
+  assert.deepEqual(restorePreferences({people:[1,2]}).people,[1,2]);
+});

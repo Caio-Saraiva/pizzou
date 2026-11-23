@@ -1,6 +1,6 @@
 import {test} from 'node:test';
 import assert from 'node:assert/strict';
-import {allocateFlavors, seededShuffle, fraction, packPizzas} from '../src/voting.js';
+import {allocateFlavors, seededShuffle, fraction, packPizzas, allocateDietaryFlavors} from '../src/voting.js';
 const ids=['a','b','c'];
 test('IRV transfers an eliminated preference instead of selecting the plurality leader',()=>{
   const ballots=[...Array.from({length:4},()=>['a','b','c']),...Array.from({length:3},()=>['b','c','a']),...Array.from({length:2},()=>['c','b','a'])];
@@ -106,4 +106,52 @@ test('invalid weights and fractional pizza counts are rejected', () => {
 test('large appetite references do not hit the previous pizza limit', () => {
   const result=allocateFlavors([ids],ids,100000,4,1,[100000]);
   assert.equal(result.pizzas.reduce((sum,g)=>sum+g.count,0),100000);
+});
+
+const dietaryFlavors = [{id:'a',veggie:true},{id:'b',veggie:true},{id:'c',veggie:false}];
+test('dietary appetite is protected even when a restricted voter ranks meat first', () => {
+  const plan=allocateDietaryFlavors([['c','a','b'],['c','b','a']],dietaryFlavors,2,2,9,[7,3],[true,false],8);
+  assert.equal(plan.veggiePizzaCount,1);
+  assert.equal(plan.veggieDemand,7);
+  assert.ok(plan.pizzas.filter(g=>g.portions.every(p=>p.id!=='c')).reduce((sum,g)=>sum+g.count,0)*8>=7);
+});
+test('unrestricted voters can choose veggie pizzas and marked options cannot disappear', () => {
+  const plan=allocateDietaryFlavors([['a','b','c'],['c','b','a']],dietaryFlavors,2,3,9,[7,3],[false,false],8);
+  assert.equal(plan.veggiePizzaCount,1);
+  const minimum=allocateDietaryFlavors([['c','a','b']],dietaryFlavors,2,4,9,[9],[false],8);
+  assert.equal(minimum.veggiePizzaCount,1);
+});
+test('one shared pizza becomes fully veggie when needed, including unrestricted votes', () => {
+  const plan=allocateDietaryFlavors([['c','a','b'],['c','b','a']],dietaryFlavors,1,4,9,[3,5],[true,false],8);
+  assert.equal(plan.veggiePizzaCount,1);
+  assert.equal(plan.pizzas.reduce((sum,g)=>sum+g.count,0),1);
+  assert.ok(plan.allocations.some(a=>a.id==='b'));
+  assert.ok(plan.allocations.every(a=>a.id!=='c'));
+});
+test('dietary packing conserves all portions and never mixes pools for every division', () => {
+  for(const parts of [1,2,3,4]) for(const count of [1,2,3,8]) for(const dietary of [[false,false,false],[true,false,false],[true,true,true]]) {
+    const ballots=[['c','b','a'],['a','c','b'],['b','a','c']];
+    const plan=allocateDietaryFlavors(ballots,dietaryFlavors,count,parts,42,[1,2,3],dietary,8);
+    assert.equal(plan.pizzas.reduce((sum,g)=>sum+g.count,0),count);
+    assert.equal(plan.allocations.reduce((sum,a)=>sum+a.units,0),count*parts);
+    for(const g of plan.pizzas) {
+      assert.equal(g.portions.reduce((sum,p)=>sum+p.units,0),parts);
+      assert.equal(new Set(g.portions.map(p=>p.id==='c')).size,1);
+    }
+    assert.ok(plan.veggiePizzaCount*8>=plan.veggieDemand);
+    for(const a of plan.allocations) assert.equal(plan.pizzas.reduce((sum,g)=>sum+g.count*(g.portions.find(p=>p.id===a.id)?.units||0),0),a.units);
+  }
+});
+test('dietary validation rejects impossible demand and missing compatible options', () => {
+  assert.throws(()=>allocateDietaryFlavors([ids],ids.map(id=>({id})),1,2,1,[5],[true],8),/Missing veggie/);
+  assert.throws(()=>allocateDietaryFlavors([ids],dietaryFlavors,1,2,1,[9],[true],8),/Invalid dietary/);
+  for(const flags of [[],[1],null]) assert.throws(()=>allocateDietaryFlavors([ids],dietaryFlavors,1,2,1,[5],flags,8));
+  const original=allocateFlavors([ids],ids,1,2,1,[5]);
+  assert.deepEqual(allocateDietaryFlavors([ids],ids.map(id=>({id})),1,2,1,[5],[false],8),original);
+});
+test('all-veggie menus support a single compatible candidate and everyone is counted', () => {
+  const plan=allocateDietaryFlavors([['a','b'],['b','a']],[{id:'a',veggie:true},{id:'b',veggie:true}],2,2,1,[3,5],[true,false],8);
+  assert.equal(plan.veggiePizzaCount,2);
+  assert.equal(plan.allocations.reduce((sum,a)=>sum+a.units,0),4);
+  assert.deepEqual(allocateFlavors([['a']],['a'],1,3).allocations,[{id:'a',units:3}]);
 });

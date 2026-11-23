@@ -364,3 +364,19 @@ body { overflow-anchor: none; }
 }
 
 .baseline-control output { min-width: 44px; width: auto; padding-inline: 8px; font-size: clamp(11px, calc(27px - var(--digits, 1) * 2px), 23px); }
+
+:root { --veggie: #397143; --veggie-soft: #eaf3e5; }
+:root[data-theme="dark"] { --veggie: #a1d58b; --veggie-soft: #293829; }
+.people-empty { grid-column: 1 / -1; display: flex; flex: 1; flex-direction: column; align-items: center; justify-content: center; gap: 12px; min-height: 180px; padding: 20px; color: var(--muted); font-size: 13px; }
+.people-empty-add { display: grid; place-items: center; width: 72px; height: 72px; border: 2px dashed var(--line); border-radius: 24px; background: var(--soft); color: var(--red); cursor: pointer; transition: transform .2s, border-color .2s; }
+.people-empty-add .icon { width: 32px; height: 32px; }
+.people-empty-add:hover { transform: scale(1.06); border-color: var(--red); }
+.people-empty-arrow { display: inline-flex; color: var(--red); }
+@media (prefers-reduced-motion: no-preference) {
+  .people-empty-arrow { animation: invite-add 1.5s ease-in-out infinite; }
+  @keyframes invite-add { 50% { transform: translateY(6px); } }
+}
+@media (max-height: 450px) and (orientation: landscape) {
+  .people-empty { min-height: 95px; padding: 8px; gap: 4px; }
+  .people-empty-add { width: 48px; height: 48px; border-radius: 16px; }
+}
