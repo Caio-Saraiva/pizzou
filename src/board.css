@@ -1,0 +1,209 @@
+/* A single mounted interface switches between the portrait wizard and this board. */
+:root.board-viewport { overflow: hidden; }
+.board-layout {
+  height: 100dvh;
+  display: grid;
+  grid-template-rows: 76px minmax(0, 1fr) 44px;
+}
+.board-layout .header, .board-layout footer {
+  width: calc(100% - 48px);
+  max-width: 1392px;
+  margin-inline: auto;
+}
+.board-layout .header { height: 100%; }
+.board-layout footer { padding: 0; font-size: 12px; }
+.board-layout footer button { font-size: 12px; }
+.board-main {
+  width: 100%;
+  max-width: 1440px;
+  justify-self: center;
+  padding: 22px 24px 16px;
+  display: grid;
+  grid-template-rows: auto minmax(0, 1fr);
+  gap: 24px;
+  min-height: 0;
+}
+.board-heading h1 { font-size: 32px; letter-spacing: -1.3px; }
+.board-heading p { color: var(--muted); font-size: 14px; margin-top: 8px; }
+.board-columns {
+  display: grid;
+  grid-template-columns: minmax(0, .9fr) minmax(0, 1.08fr) minmax(0, 1fr);
+  gap: 22px;
+  min-height: 0;
+}
+.board-layout .panel { display: flex; flex-direction: column; min-height: 0; padding: 22px; }
+.board-layout .section-heading { flex-shrink: 0; flex-wrap: wrap; }
+.board-layout .section-heading h2 { font-size: 19px; }
+.board-layout .section-hint { flex-shrink: 0; margin: 8px 0 18px; font-size: 13px; }
+.board-layout .size-grid { flex: 1; min-height: 0; grid-template-columns: 1fr; grid-template-rows: repeat(3, minmax(0, 1fr)); gap: 12px; }
+.board-layout .size-card { display: grid; min-height: 0; grid-template-columns: 76px minmax(0, 1fr); grid-template-rows: 1fr 1fr; text-align: left; column-gap: 16px; row-gap: 4px; padding: 14px; }
+.board-layout .size-card:hover { transform: translateX(3px); }
+.board-layout .size-art { grid-column: 1; grid-row: 1 / span 2; height: 76px; margin: 0; }
+.board-layout .size-art.small .pizza-art { width: 52px; }
+.board-layout .size-art .pizza-art { width: 66px; }
+.board-layout .size-art.large .pizza-art { width: 76px; }
+.board-layout .size-card strong { grid-column: 2; grid-row: 1; align-self: end; font-size: 17px; padding-right: 16px; }
+.board-layout .size-card > span:last-child { grid-column: 2; grid-row: 2; align-self: start; font-size: 13px; }
+.board-layout .people-grid { flex: 1; min-height: 0; max-height: none; display: flex; flex-direction: column; gap: 10px; overscroll-behavior: contain; }
+.board-layout .person { flex-shrink: 0; min-height: 84px; }
+.board-layout .avatar { width: 43px; }
+.board-layout .person-copy strong { font-size: 14px; }
+.board-layout .person-name { font-size: 12px; }
+.board-layout .hunger-key { flex-shrink: 0; font-size: 12px; gap: 16px; margin-top: 16px; }
+.board-layout .hunger-key > span { gap: 4px; }
+.board-result-column { min-height: 0; min-width: 0; display: flex; flex-direction: column; gap: 12px; }
+.board-result-body { flex: 1; min-height: 0; }
+.board-result-body .result-note { display: none; }
+.board-layout .result-card { height: 100%; display: flex; flex-direction: column; padding: 20px 22px 0; }
+.board-layout .result-top { flex-shrink: 0; }
+.board-layout .result-label { font-size: 11px; letter-spacing: 1.5px; }
+.board-layout .result-hero { flex: 1; min-height: 0; gap: 20px; padding: 16px 0; }
+.board-layout .hero-pizza { width: clamp(60px, 16dvh, 150px); height: clamp(60px, 16dvh, 150px); flex-shrink: 0; }
+.board-layout .result-title > strong { font-size: clamp(44px, 8dvh, 74px); letter-spacing: -3px; }
+.board-layout .result-title > h2 { font-size: clamp(22px, 3.4dvh, 30px); letter-spacing: -1px; }
+.board-layout .order-items { flex-shrink: 0; padding: 12px 0; }
+.board-layout .order-row { gap: 8px; }
+.board-layout .order-row > strong { font-size: 15px; }
+.board-layout .order-row > span:last-child { font-size: 13px; }
+.board-layout .result-math { flex-shrink: 0; flex-wrap: wrap; gap: 6px 16px; font-size: 13px; padding: 16px 0 12px; }
+.board-layout .leftovers { flex-shrink: 0; font-size: 13px; padding-bottom: 18px; }
+.board-actions { display: flex; flex-shrink: 0; gap: 10px; }
+.board-actions .primary-action { flex: 1; min-width: 0; }
+.board-share { flex-shrink: 0; width: 54px; height: 54px; background: var(--panel); border: 1px solid var(--line); border-radius: 14px; color: var(--red); }
+.board-share:hover:not(:disabled) { background: var(--selected); }
+.placeholder-content { flex: 1; min-height: 0; display: flex; flex-direction: column; justify-content: center; align-items: center; gap: 22px; text-align: center; padding: 16px 0; }
+.placeholder-content h2 { font-size: 18px; letter-spacing: -.5px; line-height: 1.4; }
+.placeholder-pizza { width: clamp(70px, 18dvh, 150px); position: relative; opacity: .65; }
+.placeholder-pizza .pizza-art { width: 100%; filter: saturate(.55); }
+.placeholder-pizza > span { position: absolute; right: -6px; bottom: 0; display: grid; place-items: center; width: 44px; height: 44px; background: var(--panel); border-radius: 50%; color: var(--red); font-size: 29px; font-weight: 700; }
+.pending-dots { display: flex; gap: 5px; height: 6px; visibility: hidden; }
+.pending-dots i { width: 5px; height: 5px; background: var(--red); border-radius: 50%; }
+.is-updating .pending-dots { visibility: visible; }
+.is-updating .pending-dots i { animation: pending-dot .55s ease-in-out infinite alternate; }
+.is-updating .pending-dots i:nth-child(2) { animation-delay: .12s; }.is-updating .pending-dots i:nth-child(3) { animation-delay: .24s; }
+.is-updating .placeholder-pizza { animation: pending-pizza .6s ease-in-out infinite alternate; }
+@keyframes pending-dot { from { opacity: .3; transform: translateY(2px); } to { opacity: 1; transform: translateY(-2px); } }
+@keyframes pending-pizza { from { opacity: .3; transform: scale(.94); } to { opacity: .65; transform: scale(1); } }
+@media (max-width: 1100px) {
+  .board-columns { gap: 16px; }
+  .board-layout .panel { padding: 18px; }
+  .board-layout .section-heading h2 { font-size: 17px; }
+  .board-layout .section-hint { font-size: 12px; }
+  .board-layout .size-card { grid-template-columns: 58px minmax(0, 1fr); column-gap: 10px; padding: 12px 10px; }
+  .board-layout .size-art { height: 60px; }
+  .board-layout .size-art.small .pizza-art { width: 42px; }.board-layout .size-art .pizza-art { width: 51px; }.board-layout .size-art.large .pizza-art { width: 60px; }
+  .board-layout .size-card strong { font-size: 15px; }
+  .board-layout .stepper { gap: 2px; }.board-layout .step-button { width: 38px; height: 44px; }.board-layout .people-count { width: 25px; }
+  .board-layout .result-card { padding-inline: 16px; }
+  .board-layout .result-hero { gap: 12px; }
+  .board-layout .hero-pizza { width: clamp(56px, 11vw, 120px); height: clamp(56px, 11vw, 120px); }
+}
+@media (max-height: 600px) {
+  .board-layout { grid-template-rows: 54px minmax(0, 1fr) 30px; }
+  .board-layout .header, .board-layout footer { width: calc(100% - 32px); }
+  .board-layout .brand { font-size: 28px; }.board-layout .brand > .icon { width: 25px; height: 27px; }
+  .board-heading { display: none; }
+  .board-main { padding: 12px 16px 8px; grid-template-rows: minmax(0, 1fr); gap: 0; }
+  .board-columns { gap: 12px; }
+  .board-layout .panel { padding: 12px; border-radius: 18px; }
+  .board-layout .section-heading { min-height: 22px; gap: 6px; }
+  .board-layout .section-heading h2 { font-size: 15px; line-height: 1.3; letter-spacing: -.4px; }
+  .board-layout .section-hint { font-size: 12px; margin: 7px 0 12px; line-height: 1.3; }
+  .board-layout .size-panel > .section-hint { display: none; }
+  .board-layout .size-grid { margin-top: 12px; gap: 8px; }
+  .board-layout .size-card { padding: 7px 6px; grid-template-columns: 44px minmax(0, 1fr); column-gap: 8px; row-gap: 2px; border-radius: 12px; }
+  .board-layout .size-art { height: 44px; }
+  .board-layout .size-art.small .pizza-art { width: 31px; }.board-layout .size-art .pizza-art { width: 38px; }.board-layout .size-art.large .pizza-art { width: 44px; }
+  .board-layout .size-card strong { font-size: 14px; padding-right: 8px; }
+  .board-layout .size-card > span:last-child { font-size: 12px; }
+  .board-layout .selection-check { width: 14px; height: 14px; right: 5px; top: 5px; }.board-layout .selection-check .icon { width: 10px; height: 10px; }
+  .board-layout .person { min-height: 66px; padding: 9px 8px; gap: 8px; }
+  .board-layout .avatar { width: 32px; }.board-layout .person-copy { gap: 3px; }.board-layout .person-copy strong { font-size: 12px; }.board-layout .person-name { font-size: 11px; }
+  .board-layout .person-cycle .icon { width: 10px; height: 10px; }
+  .board-layout .hunger-key { margin-top: 10px; gap: 12px; font-size: 11px; }.board-layout .portion-unit { display: none; }
+  .board-layout .result-card { border-radius: 18px; padding: 12px 14px 0; }
+  .board-layout .result-label { font-size: 10px; letter-spacing: 1px; }.board-layout .live-badge { width: 20px; height: 20px; }
+  .board-layout .result-hero { padding: 8px 0; gap: 12px; }
+  .board-layout .hero-pizza { width: 64px; height: 64px; }
+  .board-layout .result-title > strong { font-size: 44px; letter-spacing: -2px; }.board-layout .result-title > h2 { font-size: 22px; }
+  .board-layout .order-items { padding: 6px 0; }.board-layout .order-row { padding: 3px 0; }.board-layout .order-row > strong { font-size: 13px; }.board-layout .order-row > span:last-child { font-size: 12px; }
+  .board-layout .result-math { padding: 9px 0 7px; gap: 5px 10px; font-size: 12px; }.board-layout .result-math .icon { width: 14px; height: 14px; }
+  .board-layout .leftovers { font-size: 12px; padding-bottom: 10px; }
+  .board-result-column { gap: 8px; }.board-actions { gap: 7px; }
+  .board-actions .primary-action { min-height: 44px; padding: 9px; font-size: 13px; gap: 7px; }.board-actions .primary-action .icon { width: 17px; height: 17px; }
+  .board-share { width: 44px; height: 44px; min-width: 44px; min-height: 44px; border-radius: 12px; }
+  .placeholder-content { gap: 12px; padding: 10px 0; }.placeholder-content h2 { font-size: 15px; }.placeholder-pizza { width: 76px; }.placeholder-pizza > span { width: 30px; height: 30px; font-size: 21px; }
+  .board-layout footer, .board-layout footer button { font-size: 11px; }.board-layout footer button { min-height: 28px; padding: 3px 8px; }
+  .board-layout .toast { bottom: 40px; }
+}
+@media (max-width: 740px) {
+  .board-layout .header-actions { gap: 4px; }
+  .board-layout .header-divider { display: none; }
+  .board-columns { grid-template-columns: minmax(0, .9fr) minmax(0, 1.08fr) minmax(0, 1fr); gap: 8px; }
+  .board-main { padding-inline: 12px; }.board-layout .panel { padding: 10px; }
+  .board-layout .section-heading h2 { font-size: 14px; }.board-layout .section-hint { font-size: 11px; }
+  .board-layout .people-panel .section-heading { justify-content: center; }.board-layout .people-panel .section-heading h2 { width: 100%; text-align: center; }
+  .board-layout .size-card { grid-template-columns: 36px minmax(0, 1fr); gap: 2px 6px; padding: 6px; }
+  .board-layout .size-art { height: 38px; }.board-layout .size-art.large .pizza-art { width: 38px; }.board-layout .size-art .pizza-art { width: 33px; }.board-layout .size-art.small .pizza-art { width: 27px; }
+  .board-layout .size-card strong { font-size: 12px; }.board-layout .size-card > span:last-child { font-size: 11px; }
+  .board-layout .hero-pizza { display: none; }.board-layout .result-title { flex-direction: row; align-items: baseline; gap: 7px; }
+  .board-layout .result-title > h2 { font-size: 20px; }
+  .board-layout .result-card { padding-inline: 10px; }.board-layout .result-top { display: none; }
+  .board-layout .order-row { flex-wrap: wrap; gap: 4px; }.board-layout .order-row > span:last-child { font-size: 11px; }
+  .board-layout .result-math { gap: 4px 7px; font-size: 11px; }.board-layout .leftovers { font-size: 11px; gap: 3px; }
+  .board-layout .board-actions .primary-action { font-size: 12px; padding-inline: 6px; }.board-actions .primary-action .icon { display: none; }
+  .board-layout .person-copy strong { font-size: 11px; }.board-layout .person { gap: 6px; padding-inline: 6px; }.board-layout .avatar { width: 28px; }
+}
+.board-layout .basil-leaf { width: 13px; height: 22px; top: -2px; right: 0; }
+.board-layout .basil-leaf:after { height: 17px; top: 2px; left: 6px; }
+.board-layout .pizza-spark.one { left: -12px; font-size: 19px; }
+.board-layout .pizza-spark.two { right: -4px; bottom: 4px; font-size: 15px; }
+
+.board-pizza-column { min-height: 0; overflow-y: auto; overscroll-behavior: contain; display: flex; flex-direction: column; gap: 16px; scrollbar-width: thin; scrollbar-color: var(--line) transparent; padding: 2px; }
+.board-pizza-column > .panel { flex-shrink: 0; }
+.board-layout .size-grid { flex: none; grid-template-rows: repeat(3, auto); }
+.board-layout .baseline-panel { padding: 18px; }
+.board-layout .baseline-list { gap: 8px; }
+.board-layout .baseline-row { flex-wrap: wrap; gap: 8px; padding: 10px; }
+.board-layout .baseline-face { width: 28px; }
+.board-layout .baseline-copy strong { font-size: 14px; }
+.board-layout .baseline-control { width: 100%; justify-content: center; gap: 8px; }
+.board-layout .baseline-rule { margin-top: 12px; }
+@media (max-width: 1100px) {
+  .board-layout .baseline-panel { padding: 12px; }
+  .board-layout .baseline-control { gap: 3px; }
+  .board-layout .baseline-control output { width: 38px; font-size: 21px; }
+  .board-layout .baseline-control .step-button { width: 44px; }
+}
+/* Keep size choices compact so the appetite settings are easy to discover. */
+.board-pizza-column .size-grid { grid-template-columns: repeat(3, minmax(0, 1fr)); grid-template-rows: auto; gap: 8px; }
+.board-pizza-column .size-card { display: flex; flex-direction: column; align-items: center; text-align: center; gap: 6px; padding: 16px 4px 12px; }
+.board-pizza-column .size-card strong { padding: 0; font-size: 14px; align-self: center; }
+.board-pizza-column .size-card > span:last-child { align-self: center; font-size: 12px; }
+.board-pizza-column .size-art { height: 64px; display: grid; place-items: center; }
+.board-pizza-column .size-art.small .pizza-art { width: 37px; }
+.board-pizza-column .size-art .pizza-art { width: 46px; }
+.board-pizza-column .size-art.large .pizza-art { width: 55px; }
+.board-pizza-column .selection-check { width: 14px; height: 14px; top: 6px; right: 6px; }
+.board-pizza-column .selection-check .icon { width: 10px; height: 10px; }
+.board-layout .baseline-panel > .section-hint { margin-bottom: 12px; }
+@media (min-width: 1101px) {
+  .board-layout .baseline-row { flex-wrap: nowrap; }
+  .board-layout .baseline-control { width: auto; gap: 2px; }
+  .board-layout .baseline-control output { width: 38px; font-size: 21px; }
+  .board-layout .baseline-face { width: 24px; }
+  .board-layout .baseline-copy strong { font-size: 13px; }
+  .board-layout .baseline-copy span { font-size: 11px; }
+}
+@media (max-width: 740px) {
+  .board-pizza-column .size-grid { grid-template-columns: 1fr; }
+  .board-pizza-column .size-card { display: grid; grid-template-columns: 36px minmax(0,1fr); grid-template-rows: 1fr 1fr; text-align: left; padding: 6px; gap: 2px 6px; }
+  .board-pizza-column .size-card strong, .board-pizza-column .size-card > span:last-child { align-self: auto; font-size: 12px; }
+  .board-pizza-column .size-art { height: 38px; }
+  .board-pizza-column .size-art .pizza-art { width: 30px; }
+  .board-pizza-column .baseline-copy strong { font-size: 12px; }
+  .board-pizza-column .baseline-face { width: 22px; }
+  .board-pizza-column .baseline-row { padding: 8px 6px; }
+  .board-pizza-column .baseline-control { gap: 0; }
+  .board-pizza-column .baseline-control output { width: 32px; }
+}
