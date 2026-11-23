@@ -66,3 +66,44 @@ test('highest custom appetite supports flavor voting for the full order', () => 
   const plan = allocateFlavors(Array.from({length:50}, () => ids), ids, 1238, 3);
   assert.equal(plan.pizzas.reduce((sum, g) => sum + g.count, 0), 1238);
 });
+
+test('weighted majority represents consumption instead of head count', () => {
+  const ballots=[['a','b'],['a','b'],['b','a']];
+  const result=allocateFlavors(ballots,['a','b'],1,1,1,[3,3,7]);
+  assert.deepEqual(result.allocations,[{id:'b',units:1}]);
+  assert.equal(result.totalWeight,13);
+  assert.deepEqual(result.ballotWeights,[3,3,7]);
+});
+test('weighted IRV transfers preferences to reach a majority of weight', () => {
+  const plan=allocateFlavors([['a','b','c'],['b','c','a'],['c','b','a']],ids,1,1,1,[3,5,7]);
+  assert.equal(plan.rounds[0].type,'eliminate');
+  assert.equal(plan.rounds[0].id,'a');
+  assert.deepEqual(plan.allocations,[{id:'b',units:1}]);
+});
+test('proportional voting consumes weight without multiplying influence', () => {
+  const ballots=[['a','b'],['a','b'],['b','a']];
+  const plan=allocateFlavors(ballots,['a','b'],5,3,1,[3,5,7]);
+  assert.equal(plan.quota,1);
+  assert.deepEqual(plan.allocations,[{id:'a',units:8},{id:'b',units:7}]);
+  const scaled=allocateFlavors(ballots,['a','b'],5,3,1,[30,50,70]);
+  assert.deepEqual(scaled.allocations,plan.allocations);
+  assert.deepEqual(scaled.pizzas,plan.pizzas);
+});
+test('weighted elections conserve pizzas across group sizes and divisions', () => {
+  for(const people of [1,3,7,50]) for(const parts of [1,2,3,4]) {
+    const ballots=Array.from({length:people},(_,i)=>seededShuffle(ids,i));
+    const weights=Array.from({length:people},(_,i)=>[1,5,101][i%3]);
+    const plan=allocateFlavors(ballots,ids,13,parts,10,weights);
+    assert.equal(plan.allocations.reduce((sum,a)=>sum+a.units,0),13*parts);
+    assert.equal(plan.pizzas.reduce((sum,g)=>sum+g.count,0),13);
+  }
+});
+test('invalid weights and fractional pizza counts are rejected', () => {
+  for(const weights of [[],[1,2],[0],[-1],[NaN],[Infinity],['3'],null])
+    assert.throws(()=>allocateFlavors([ids],ids,1,2,1,weights));
+  assert.throws(()=>allocateFlavors([ids],ids,1.5,2));
+});
+test('large appetite references do not hit the previous pizza limit', () => {
+  const result=allocateFlavors([ids],ids,100000,4,1,[100000]);
+  assert.equal(result.pizzas.reduce((sum,g)=>sum+g.count,0),100000);
+});

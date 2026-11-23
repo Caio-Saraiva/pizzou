@@ -5,10 +5,20 @@ export const SIZES = [
 ];
 export const PORTIONS = [3, 5, 7];
 
-export const MAX_PORTION = 99;
 export function validPortions(portions) {
   return Array.isArray(portions) && portions.length === 3 && portions.every((n, i) =>
-    Number.isInteger(n) && n >= 1 && n <= MAX_PORTION && (i === 0 || n > portions[i - 1]));
+    Number.isSafeInteger(n) && n >= 1 && (i === 0 || n > portions[i - 1]));
+}
+
+// Move neighbors only as far as needed to preserve a strictly increasing scale.
+export function adjustPortions(portions, index, value) {
+  if (!validPortions(portions) || !Number.isInteger(index) || index < 0 || index > 2 ||
+      !Number.isSafeInteger(value) || value < index + 1) return [...portions];
+  const next = [...portions];
+  next[index] = value;
+  for (let i = index - 1; i >= 0; i--) next[i] = Math.min(next[i], next[i + 1] - 1);
+  for (let i = index + 1; i < 3; i++) next[i] = Math.max(next[i], next[i - 1] + 1);
+  return validPortions(next) ? next : [...portions];
 }
 
 // One size per order; always round up to feed the entire group.

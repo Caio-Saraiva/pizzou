@@ -362,3 +362,5 @@ body { overflow-anchor: none; }
   .baseline-control output { width: 48px; height: 44px; }
   .baseline-list { gap: 8px; }
 }
+
+.baseline-control output { min-width: 44px; width: auto; padding-inline: 8px; font-size: clamp(11px, calc(27px - var(--digits, 1) * 2px), 23px); }

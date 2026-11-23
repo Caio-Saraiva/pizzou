@@ -1,8 +1,8 @@
 import './style.css';
 import './board.css';
 import './flavors.css';
-import { SIZES, PORTIONS, calculate } from './calculator.js';
-import { baselineEditor, portionBounds } from './appetite-editor.js';
+import { SIZES, PORTIONS, calculate, adjustPortions } from './calculator.js';
+import { baselineEditor } from './appetite-editor.js';
 import { languages, messages } from './i18n.js';
 import { restorePreferences } from './preferences.js';
 import { icon, face, pizza } from './graphics.js';
@@ -23,7 +23,7 @@ const t = () => messages[state.lang];
 const slicesText = n => `${n} ${n === 1 ? t().slice : t().slices}`;
 const chosenSize = () => SIZES.find(size => size.id === state.size);
 const flavorFlow = new FlavorFlow({
-  getOrder: () => ({result, people: state.people, size: state.size}), t,
+  getOrder: () => ({result, people: state.people, size: state.size, portions: state.portions}), t,
   onComplete: plan => {flavorPlan = plan; orderRevision++; updateFlavorLaunch();},
   onReceipt: () => openReceipt(document.querySelector('.board-share, .flow-actions [data-action="receipt"]')),
   notify,
@@ -211,14 +211,18 @@ app.addEventListener('click', async event => {
   if (!['language','locale'].includes(action)) closeLanguages();
   if (action === 'baseline' && (boardMode.matches || step === 1)) {
     const i = Number(index), n = state.portions[i] + Number(value);
-    const {min, max} = portionBounds(state.portions, i);
-    if (n < min || n > max) return;
-    state.portions[i] = n;
+    const previous = [...state.portions];
+    state.portions = adjustPortions(state.portions, i, n);
+    if (state.portions.every((n, i) => n === previous[i])) return;
     invalidateResult();
     const scroll = document.querySelector('.board-pizza-column')?.scrollTop || 0;
     render();
     const column = document.querySelector('.board-pizza-column');
     if (column) column.scrollTop = scroll;
+    state.portions.forEach((n, level) => {
+      if (n !== previous[level]) animate(document.querySelectorAll('.baseline-row')[level],
+        [{background:'var(--selected)',transform:'scale(.97)'},{background:'transparent',transform:'scale(1)'}], 350);
+    });
     const same = document.querySelector(`[data-action="baseline"][data-index="${i}"][data-value="${value}"]`);
     const target = same.disabled ? document.querySelector(`[data-action="baseline"][data-index="${i}"]:not(:disabled)`) : same;
     target?.focus({preventScroll:true});

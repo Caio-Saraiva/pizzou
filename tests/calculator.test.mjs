@@ -1,6 +1,6 @@
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
-import { calculate, SIZES } from '../src/calculator.js';
+import { calculate, SIZES, adjustPortions } from '../src/calculator.js';
 import { restorePreferences } from '../src/preferences.js';
 
 test('four normal appetites get three regular pizzas or two large pizzas', () => {
@@ -64,8 +64,34 @@ test('custom appetite references drive demand, rounding and persistence', () => 
   assert.equal(calculate(Array(50).fill(2), 'small', [97, 98, 99]).count, 1238);
 });
 test('appetite references must be positive ascending integers', () => {
-  for (const portions of [[0, 5, 7], [3, 3, 7], [3, 7, 5], [3, 5, 5], [3, 5, 100], [1.5, 5, 7], [3, 5], null]) {
+  for (const portions of [[0, 5, 7], [3, 3, 7], [3, 7, 5], [3, 5, 5], [1.5, 5, 7], [3, 5], null]) {
     assert.throws(() => calculate([1], 'medium', portions));
     assert.deepEqual(restorePreferences({portions}).portions, [3, 5, 7]);
   }
+});
+
+test('increases push all following appetite levels recursively', () => {
+  assert.deepEqual(adjustPortions([3, 4, 5], 0, 4), [4, 5, 6]);
+  assert.deepEqual(adjustPortions([3, 5, 7], 1, 7), [3, 7, 8]);
+  assert.deepEqual(adjustPortions([3, 5, 7], 0, 1000), [1000, 1001, 1002]);
+  assert.deepEqual(adjustPortions([3, 5, 7], 2, 10000), [3, 5, 10000]);
+});
+test('decreases pull preceding appetite levels without crossing the minimum', () => {
+  assert.deepEqual(adjustPortions([3, 5, 7], 2, 3), [1, 2, 3]);
+  assert.deepEqual(adjustPortions([3, 5, 7], 1, 2), [1, 2, 7]);
+  for (const i of [0, 1, 2]) assert.deepEqual(adjustPortions([1, 2, 3], i, i), [1, 2, 3]);
+  assert.deepEqual(adjustPortions([3, 5, 7], 1, 4), [3, 4, 7]);
+});
+test('cascade preserves strict order through repeated increases and decreases', () => {
+  let portions = [1, 2, 3];
+  for (let n=0; n<500; n++) {
+    const i=n%3;
+    portions=adjustPortions(portions,i,portions[i]+1);
+    assert.ok(portions[0]>=1 && portions[0]<portions[1] && portions[1]<portions[2]);
+  }
+  assert.ok(portions[2]>99);
+  assert.equal(calculate([2], 'small', portions).demand, portions[2]);
+  assert.deepEqual(restorePreferences({portions}).portions, portions);
+  for (let n=0; n<1000; n++) portions=adjustPortions(portions,2,portions[2]-1);
+  assert.deepEqual(portions,[1,2,3]);
 });

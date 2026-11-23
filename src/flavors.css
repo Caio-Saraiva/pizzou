@@ -42,10 +42,6 @@
 .fl-split.selected { border-color: var(--red); background: var(--selected); color: var(--red); }
 .fl-limit { font-size: 12px; color: var(--muted); margin-top: 16px; line-height: 1.5; }
 .fl-vote-body { display: flex; flex-direction: column; overflow: hidden; }
-.fl-voter { display: flex; align-items: center; gap: 12px; flex-shrink: 0; margin-bottom: 14px; }
-.fl-voter h2 { font-size: 22px; }
-.fl-voter p { color: var(--muted); font-size: 13px; margin-top: 4px; }
-.fl-voter-avatar { width: 49px; height: 49px; border-radius: 15px; background: var(--green-bg); color: var(--green); display: grid; place-items: center; }
 .fl-vote-body > .fl-hint { flex-shrink: 0; font-size: 13px; }
 .fl-ranking { list-style: none; padding: 4px; margin: 14px -4px -4px; overflow-y: auto; flex: 1; min-height: 0; display: flex; flex-direction: column; gap: 8px; overscroll-behavior: contain; scrollbar-width: thin; }
 .fl-rank-card { display: flex; align-items: center; gap: 9px; flex-shrink: 0; min-height: 72px; padding: 10px 8px 10px 12px; background: var(--panel); border: 1px solid var(--line); border-radius: 14px; position: relative; }
@@ -61,10 +57,6 @@
 .fl-handoff { display: flex; flex-direction: column; justify-content: center; align-items: center; text-align: center; gap: 15px; }
 .fl-handoff h2 { font-size: 27px; }
 .fl-handoff > p { color: var(--muted); font-size: 14px; line-height: 1.5; }
-.fl-handoff > strong { font: 800 25px Manrope,sans-serif; color: var(--red); }
-.fl-pass-art { height: 90px; width: 90px; border-radius: 27px; background: var(--green-bg); color: var(--green); display: grid; place-items: center; position: relative; margin-bottom: 5px; }
-.fl-pass-art > .icon { width: 43px; height: 43px; }
-.fl-pass-art > span { position: absolute; right: -8px; bottom: -5px; background: var(--red); color: var(--panel); width: 35px; height: 35px; display: grid; place-items: center; border-radius: 50%; font-weight: 700; }
 .fl-handoff .fl-privacy { font-size: 12px; margin-top: 15px; }
 .fl-final-heading { display: flex; flex-direction: column; align-items: center; text-align: center; gap: 10px; padding-bottom: 22px; }
 .fl-final-heading h2 { font-size: 27px; }
@@ -132,3 +124,37 @@
 @media (max-width: 420px) {
   .fl-division [role="radiogroup"] { grid-template-columns: repeat(2, minmax(0, 1fr)); }
 }
+
+.voter-identity { display: flex; align-items: center; gap: 14px; flex-shrink: 0; min-width: 0; }
+.voter-face { color: var(--hunger); display: block; flex-shrink: 0; width: 54px; }
+.voter-copy { min-width: 0; }
+.voter-person { font-size: 13px; color: var(--muted); margin-bottom: 4px; }
+.voter-person > span { white-space: nowrap; }
+.voter-identity h2 { font-size: 22px; letter-spacing: -.7px; line-height: 1.2; overflow-wrap: anywhere; }
+.voter-weight { display: flex; flex-wrap: wrap; align-items: baseline; gap: 4px 8px; font-size: 12px; color: var(--muted); margin-top: 6px; }
+.voter-weight strong { color: var(--text); font-size: 14px; font-variant-numeric: tabular-nums; }
+.voter-compact { padding-bottom: 16px; }
+.voter-hero { flex-direction: column; gap: 26px; width: 100%; }
+.voter-hero .voter-face { width: clamp(88px, 17dvh, 140px); filter: drop-shadow(0 12px 15px #0000000c); animation: voter-bob 2s ease-in-out 2; }
+.voter-hero .voter-person { font-size: 16px; margin-bottom: 12px; }
+.voter-hero h2 { font-size: clamp(32px, 6vw, 46px); letter-spacing: -1.4px; }
+.voter-hero .voter-weight { justify-content: center; flex-direction: column; align-items: center; gap: 5px; margin-top: 22px; }
+.voter-hero .voter-weight strong { font-size: 24px; }
+.fl-handoff { gap: 24px; }
+.fl-handoff .voter-eyebrow { font-size: 14px; font-weight: 600; }
+.fl-handoff .fl-privacy { margin-top: 0; }
+@keyframes voter-bob { 0%,100% { transform: translateY(0) rotate(-3deg); } 50% { transform: translateY(-8px) rotate(3deg); } }
+@media (orientation: landscape) and (max-height: 600px) {
+  .fl-handoff { gap: 10px; }
+  .voter-hero { flex-direction: row; justify-content: center; text-align: left; gap: 24px; }
+  .voter-hero .voter-face { width: 82px; }
+  .voter-hero .voter-person { margin-bottom: 5px; font-size: 13px; }
+  .voter-hero h2 { font-size: 30px; }
+  .voter-hero .voter-weight { flex-direction: row; margin-top: 8px; justify-content: flex-start; gap: 8px; }
+  .voter-hero .voter-weight strong { font-size: 18px; }
+  .voter-compact { gap: 10px; padding-bottom: 8px; }
+  .voter-compact .voter-face { width: 38px; }
+  .voter-compact h2 { font-size: 18px; }
+  .voter-compact .voter-weight { margin-top: 3px; }
+}
+@media (prefers-reduced-motion: reduce) { .voter-hero .voter-face { animation: none; } }

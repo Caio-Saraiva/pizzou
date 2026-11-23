@@ -46,10 +46,17 @@ Cada seletor tem uma carinha e um nome, o botão **−** à esquerda, o número 
 A ordem é sempre estrita:
 
 ```text
-1 ≤ pouca fome < fome normal < muita fome ≤ 99
+1 ≤ pouca fome < fome normal < muita fome
 ```
 
-Os botões ficam desabilitados quando o próximo ajuste quebraria essa regra. Por exemplo, com valores **3 / 4 / 7**, não dá para aumentar pouca fome para 4 nem diminuir fome normal para 3. Ajustar um nível não altera os outros silenciosamente.
+Os níveis se ajustam **em cascata**, com uma animação nos valores afetados:
+
+- Ao aumentar um nível até alcançar o seguinte, o seguinte sobe junto. De **3 / 4 / 5**, aumentar pouca fome para 4 resulta em **4 / 5 / 6**.
+- Ao diminuir um nível até alcançar o anterior, o anterior desce junto. De **3 / 5 / 7**, baixar muita fome até 3 resulta em **1 / 2 / 3**.
+- A cascata só move os vizinhos necessários. De **3 / 5 / 7**, baixar fome normal para 4 mantém **3 / 4 / 7**.
+- O mínimo é **1 / 2 / 3**. Nesse ponto os três botões de diminuir ficam desabilitados; aumentar continua disponível.
+
+Não há teto de produto em 99: é possível continuar aumentando as referências. A implementação usa os inteiros seguros do JavaScript.
 
 Os números representam **fatias por pessoa**, e a referência é a pizza do tamanho escolhido. Se você mudar o tamanho, pode reajustar essa referência. Os valores ficam salvos neste navegador e **Recomeçar** restaura 3 / 5 / 7.
 
@@ -88,7 +95,11 @@ A divisão dos **sabores** é independente da quantidade de **fatias** usada no 
 
 Toque em **Começar votação**.
 
-### 6. Cada pessoa ordena suas preferências
+### 6. Confira quem vai votar e ordene as preferências
+
+Antes do **primeiro voto** e entre todas as pessoas, a tela mostra uma carinha grande, o número da pessoa, o nível de fome e o peso daquele voto. Confira se é sua vez e toque em **Sou eu**.
+
+<img src="docs/screenshots/new-16-first-voter.png" width="360" alt="Identificação antes do primeiro voto: Pessoa 01, pouca fome, peso de 3 fatias">
 
 Coloque o sabor favorito no topo. Arraste pela alça ou toque nos botões de subir e descer. Todos os sabores devem estar ordenados; a ordem inicial é embaralhada para cada pessoa.
 
@@ -98,15 +109,17 @@ Toque em **Confirmar voto**. A tela de passagem esconde o ranking anterior antes
 
 <img src="docs/screenshots/new-07-handoff.png" width="360" alt="Tela para passar o aparelho à próxima pessoa sem expor o ranking anterior">
 
-A próxima pessoa toca em **Estou pronto** e faz seu ranking. Cada pessoa tem **um voto de mesmo peso**, independentemente da fome.
+A próxima pessoa confere sua fome, toca em **Sou eu** e faz seu ranking. A identidade e o peso continuam visíveis durante o voto.
+
+O **peso do voto corresponde às fatias configuradas para a fome daquela pessoa**. Com as referências 3 / 5 / 7, os pesos são 3, 5 e 7. Pessoas com a mesma fome têm o mesmo peso; quem pretende comer mais participa proporcionalmente mais da escolha. O app usa as referências personalizadas do pedido, sem multiplicadores extras por categoria.
 
 ### 7. Veja os sabores agrupados
 
 O resultado conserva a quantidade calculada de pizzas, monta inteiras quando possível e reúne as frações restantes em pizzas mistas. As pizzas com sabores em comum ficam próximas: por exemplo, uma pizza inteira de Margherita aparece junto da pizza com a fração restante de Margherita.
 
-<img src="docs/screenshots/new-08-flavors.png" width="360" alt="Resultado com pizza inteira de Margherita, pizza de dois terços de Margherita e um terço de Calabresa, seguida da inteira de Calabresa">
+<img src="docs/screenshots/new-08-flavors.png" width="360" alt="Resultado ponderado pela fome com duas pizzas de Calabresa e uma pizza mista em terços">
 
-A mesma ordem é usada na notinha. **Como os sabores foram escolhidos?** mostra as rodadas e a ordem de desempate. **Refazer votação** mantém os sabores e a divisão, mas limpa os votos.
+A mesma ordem é usada na notinha. Na captura acima, as duas pessoas com muita fome preferiram Calabresa e receberam duas pizzas desse sabor; as preferências das pessoas com pouca fome aparecem na pizza mista. **Como os sabores foram escolhidos?** mostra as rodadas e a ordem de desempate. **Refazer votação** mantém os sabores e a divisão, mas limpa os votos.
 
 ### 8. Compartilhe a notinha
 
@@ -170,13 +183,16 @@ O cálculo retorna o menor número de pizzas inteiras do tamanho escolhido que c
 
 O sistema usa votação por preferências com uma adaptação proporcional para sabores repetíveis:
 
-- **Uma única porção:** votação eliminatória (IRV). Se ninguém tiver maioria absoluta, o sabor menos apoiado é eliminado e os votos passam à próxima preferência disponível.
-- **Várias porções:** a cota por porção é `pessoas / total de porções`. Cada porção eleita consome essa quantidade de apoio; o peso restante dos votos continua disponível. Um sabor pode receber várias porções.
+- **Peso inicial:** cada ranking recebe o peso das fatias estimadas daquela pessoa. A soma dos pesos corresponde à fome estimada do grupo.
+- **Uma única porção:** votação eliminatória (IRV). A maioria é calculada sobre o peso total. Se ninguém atingir mais da metade desse peso, elimina-se o sabor menos apoiado e transfere-se o peso à próxima preferência disponível.
+- **Várias porções:** a cota por porção é `soma dos pesos / total de porções`. Cada porção eleita consome essa quantidade de apoio; o peso restante dos votos continua disponível. Um sabor pode receber várias porções.
 - **Eliminação:** se ninguém atingir a cota, elimina-se o sabor com menor apoio restante. As porções já atribuídas a ele continuam no pedido.
 - **Empates:** compara-se o apoio nas rodadas anteriores; persistindo o empate, usa-se uma ordem sorteada e fixada no início da sessão.
 - **Montagem:** separa pizzas inteiras e combina os restos sem criar ou perder porções. Depois, aproxima grupos que compartilham sabores. A ordenação não muda a apuração.
 
-A inspiração é o voto preferencial australiano. A cota por porção e a possibilidade de repetir um sabor são adaptações do pizzou; o sistema não reproduz integralmente as regras eleitorais do Senado australiano.
+Exemplo de proporcionalidade: duas pessoas apoiam A com pesos 3 e 5, e uma apoia B com peso 7. Em 15 porções, a cota é 1 e a distribuição fica **8 porções de A e 7 de B**. Cada porção consome apoio; o mesmo peso não é reutilizado integralmente nas rodadas seguintes. Multiplicar todos os pesos pela mesma constante não muda essa distribuição.
+
+A inspiração é o voto preferencial australiano. A ponderação pela fome, a cota por porção e a possibilidade de repetir um sabor são adaptações do pizzou; o sistema não reproduz integralmente as regras eleitorais do Senado australiano.
 
 Referências: [AEC — voto preferencial](https://www.aec.gov.au/learn/preferential-voting.htm) e [AEC — contagem do Senado](https://www.aec.gov.au/Voting/counting/senate_count.htm).
 
@@ -248,10 +264,11 @@ JavaScript com módulos ES, CSS e Vite. Sem framework de interface e sem depend�
 src/
   main.js             Estado, fluxo de quatro passos e eventos
   appetite-editor.js  Componente reutilizável de referências de fome e limites
-  calculator.js       Tamanhos, validação e cálculo de quantidade
+  calculator.js       Tamanhos, ajustes em cascata e cálculo de quantidade
   preferences.js      Persistência validada e migração de preferências
   flavor-flow.js      Cadastro, divisão, ranking e passagem entre votantes
-  voting.js           Apuração, montagem, agrupamento e frações
+  voting.js           Apuração ponderada, montagem, agrupamento e frações
+  voter-identity.js    Identidade reutilizável antes e durante cada voto
   receipt.js          Exportação da notinha em Canvas/PNG
   share.js            Compartilhamento do link do app
   i18n.js             Textos nos cinco idiomas
@@ -262,7 +279,7 @@ src/
 public/               Fontes, favicon e arte de compartilhamento
 scripts/              Gerador da arte social em SVG
 tests/                Testes de cálculo, persistência e votação
-docs/screenshots/     15 capturas reais do fluxo e da exportação
+docs/screenshots/     16 capturas reais do fluxo e da exportação
 server.mjs            Servidor estático de produção
 ```
 
@@ -273,15 +290,15 @@ npm test
 npm run build
 ```
 
-Os **17 testes automatizados** cobrem:
+Os **26 testes automatizados** cobrem:
 
 - Cálculo nos três tamanhos, até 50 pessoas, níveis individuais e grupos mistos.
-- Referências personalizadas, limites de 1 a 99, ordem estrita, dados inválidos e migração.
-- Transferência de preferências, distribuição proporcional e desempates reproduzíveis.
+- Referências personalizadas, cascatas nos dois sentidos, mínimo 1 / 2 / 3, aumentos acima de 99, ordem estrita, dados inválidos e migração.
+- Transferência de preferências, maioria ponderada, distribuição proporcional, consumo do peso, invariância de escala, pesos inválidos e desempates reproduzíveis.
 - Conservação de porções para inteiras, metades, terços e quartos.
 - Frações 1/3 e 2/3, agrupamento de pizzas inteiras com seus restos e pedidos grandes com referências personalizadas.
 
-A revisão no Chromium incluiu 360×800, 768×1024, 568×320, 844×390, 1280×720 e 1280×900; temas claro/escuro; textos do novo passo nos cinco idiomas; limites dos seletores; persistência; rotação; recálculo; grupo com 50 pessoas; teclado nas quatro divisões; votação completa em terços; exportação e download do PNG. As capturas publicadas estão em `docs/screenshots/`. Evidências adicionais e arquivos temporários em `output/` ficam fora do Git.
+A revisão no Chromium incluiu 360×800, 768×1024, 568×320, 844×390, 1280×720 e 1280×900; temas claro/escuro; textos do novo passo nos cinco idiomas; limites dos seletores; persistência; rotação; recálculo; grupo com 50 pessoas; teclado nas quatro divisões; identificação antes do primeiro voto e entre pessoas com fomes distintas; votação ponderada completa em terços; exportação e download do PNG. As capturas publicadas estão em `docs/screenshots/`. Evidências adicionais e arquivos temporários em `output/` ficam fora do Git.
 
 Compartilhamento nativo com aplicativos instalados e gestos em aparelhos físicos dependem do sistema e ainda precisam de verificação em dispositivos reais. O download alternativo foi validado no Chromium.
 

@@ -6,12 +6,15 @@ export function seededShuffle(values, seed) {
   for (let i = out.length - 1; i > 0; i--) { const j = Math.floor(random() * (i + 1)); [out[i], out[j]] = [out[j], out[i]]; }
   return out;
 }
-export function allocateFlavors(ballots, ids, pizzaCount, parts, seed = 1) {
+export function allocateFlavors(ballots, ids, pizzaCount, parts, seed = 1, ballotWeights = ballots.map(() => 1)) {
   if (!Array.isArray(ids) || ids.length < 2 || ids.length > 12 || new Set(ids).size !== ids.length || !ids.every(id => typeof id === 'string') ||
-      !Array.isArray(ballots) || ballots.length < 1 || ballots.length > 50 || !Number.isInteger(pizzaCount) || pizzaCount < 1 || pizzaCount > 1250 || ![1, 2, 3, 4].includes(parts) ||
+      !Array.isArray(ballots) || ballots.length < 1 || ballots.length > 50 || !Number.isSafeInteger(pizzaCount) || !Number.isSafeInteger(pizzaCount * parts) || pizzaCount < 1 || ![1, 2, 3, 4].includes(parts) ||
       !ballots.every(b => Array.isArray(b) && b.length === ids.length && new Set(b).size === ids.length && b.every(id => ids.includes(id)))) throw Error('Invalid election');
-  const units = pizzaCount * parts, quota = ballots.length / units, epsilon = 1e-9;
-  const priority = seededShuffle([...ids].sort(), seed), active = new Set(ids), weights = ballots.map(() => 1);
+  if (!Array.isArray(ballotWeights) || ballotWeights.length !== ballots.length || !ballotWeights.every(w => Number.isFinite(w) && w > 0) || !Number.isFinite(ballotWeights.reduce((sum, w) => sum + w, 0))) throw Error('Invalid ballot weights');
+  const totalWeight = ballotWeights.reduce((sum, w) => sum + w, 0);
+  const units = pizzaCount * parts, quota = totalWeight / units, epsilon = totalWeight * 1e-10;
+  const quotaTolerance = quota * 1e-10;
+  const priority = seededShuffle([...ids].sort(), seed), active = new Set(ids), weights = [...ballotWeights];
   const counts = Object.fromEntries(ids.map(id => [id, 0])), history = [], rounds = [];
   let left = units;
   const tieCompare = (a, b) => {
@@ -27,11 +30,11 @@ export function allocateFlavors(ballots, ids, pizzaCount, parts, seed = 1) {
     const sorted = [...active].sort((a, b) => Math.abs(support[b] - support[a]) > epsilon ? support[b] - support[a] : tieCompare(a, b));
     const best = sorted[0];
     // A single seat follows instant-runoff majority voting.
-    if (units === 1 && (support[best] > ballots.length / 2 || active.size === 1)) {
+    if (units === 1 && (support[best] > totalWeight / 2 || active.size === 1)) {
       counts[best] = 1; rounds.push({ type: 'elect', id: best, units: 1, support: {...support} }); break;
     }
-    if (units > 1 && (support[best] + epsilon >= quota || active.size === 1)) {
-      const number = active.size === 1 ? left : Math.min(left, Math.floor((support[best] + epsilon) / quota));
+    if (units > 1 && (support[best] + quotaTolerance >= quota || active.size === 1)) {
+      const number = active.size === 1 ? left : Math.min(left, Math.floor((support[best] + quotaTolerance) / quota));
       counts[best] += number; left -= number;
       const retain = support[best] > epsilon ? Math.max(0, (support[best] - number * quota) / support[best]) : 0;
       weights.forEach((_, i) => { if (choices[i] === best) weights[i] *= retain; });
@@ -44,7 +47,7 @@ export function allocateFlavors(ballots, ids, pizzaCount, parts, seed = 1) {
     history.push(support);
   }
   const allocations = ids.filter(id => counts[id] > 0).map(id => ({id, units: counts[id]})).sort((a, b) => b.units - a.units || priority.indexOf(a.id) - priority.indexOf(b.id));
-  return { parts, pizzaCount, quota: units === 1 ? null : quota, allocations, rounds, tieOrder: priority, pizzas: packPizzas(allocations, parts) };
+  return { parts, pizzaCount, ballotWeights: [...ballotWeights], totalWeight, quota: units === 1 ? null : quota, allocations, rounds, tieOrder: priority, pizzas: packPizzas(allocations, parts) };
 }
 export function packPizzas(allocations, parts) {
   const groups = [], loose = [];

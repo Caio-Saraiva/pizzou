@@ -122,7 +122,7 @@ export const messages = {
       "confirm": "Confirmar voto",
       "handoff": "Passe o celular",
       "ready": "Próxima pessoa, sua vez!",
-      "start": "Estou pronto",
+      "start": "Sou eu",
       "voted": "votos confirmados",
       "drag": "Arrastar para reordenar",
       "up": "Subir",
@@ -130,7 +130,7 @@ export const messages = {
       "finished": "Pedido decidido!",
       "finishHint": "Mesma quantidade de pizza. Sabores escolhidos pela galera.",
       "method": "Como os sabores foram escolhidos?",
-      "methodText": "Cada pessoa tem um voto de mesmo peso. Para uma única porção, eliminamos o sabor menos votado e transferimos seus votos para a próxima preferência, até existir maioria. Para várias porções, usamos uma adaptação proporcional: cada porção consome uma cota igual ao número de pessoas dividido pelo número de porções. O saldo dos votos continua valendo; quando um sabor é eliminado, esse saldo passa à próxima preferência. Um sabor pode ganhar várias porções.",
+      "methodText": "Os votos têm peso proporcional às fatias de cada pessoa. Em uma única porção, eliminamos o sabor menos apoiado e transferimos suas preferências até haver maioria do peso. Com várias porções, cada porção consome uma cota: peso total dividido pelas porções. Só o peso restante continua nas transferências. Um sabor pode receber várias porções.",
       "tieText": "Empates usam o histórico de apoio. Se persistirem, usamos uma ordem sorteada e fixada no início desta votação.",
       "tieOrder": "Ordem sorteada",
       "eliminated": "Eliminado",
@@ -142,7 +142,9 @@ export const messages = {
       "resultSummary": "Sabores eleitos",
       "voteProgress": "Votação",
       "privacy": "Só aparece o ranking da pessoa da vez.",
-      "whole": "Inteira"
+      "whole": "Inteira",
+      "voteWeight": "Peso do voto",
+      "yourTurn": "Quem vai votar?"
     },
     "baseline": {
       "title": "O que é fome pra vocês?",
@@ -152,7 +154,7 @@ export const messages = {
       "unit": "fatias por pessoa",
       "less": "Diminuir fatias",
       "more": "Aumentar fatias",
-      "rule": "Pouca < normal < muita fome. Os limites mantêm essa ordem.",
+      "rule": "Se um nível encostar no outro, ajustamos os vizinhos automaticamente.",
       "next": "Ajustar fome"
     }
   },
@@ -272,7 +274,7 @@ export const messages = {
       "confirm": "Confirm vote",
       "handoff": "Pass the phone",
       "ready": "Next person, it’s your turn!",
-      "start": "I’m ready",
+      "start": "That’s me",
       "voted": "votes confirmed",
       "drag": "Drag to reorder",
       "up": "Move up",
@@ -280,7 +282,7 @@ export const messages = {
       "finished": "Order decided!",
       "finishHint": "Same number of pizzas. Flavors chosen by everyone.",
       "method": "How were the flavors chosen?",
-      "methodText": "Everyone has one equally weighted vote. For a single portion, the lowest flavor is eliminated and votes move to the next preference until there is a majority. For multiple portions, we use a proportional adaptation: each portion consumes a quota equal to people divided by portions. Remaining vote weight stays active; when a flavor is eliminated, that weight transfers to the next preference. A flavor may receive multiple portions.",
+      "methodText": "Votes are weighted by each person’s slices. For one portion, the least supported flavor is eliminated and preferences transfer until a majority of the weight is reached. For multiple portions, each portion consumes a quota: total weight divided by portions. Only remaining weight transfers. A flavor can receive multiple portions.",
       "tieText": "Ties use earlier support counts, then a random order fixed at the start of this vote.",
       "tieOrder": "Drawn order",
       "eliminated": "Eliminated",
@@ -292,7 +294,9 @@ export const messages = {
       "resultSummary": "Elected flavors",
       "voteProgress": "Voting",
       "privacy": "Only the current person’s ranking is shown.",
-      "whole": "Whole"
+      "whole": "Whole",
+      "voteWeight": "Vote weight",
+      "yourTurn": "Who is voting?"
     },
     "baseline": {
       "title": "How hungry is hungry?",
@@ -302,7 +306,7 @@ export const messages = {
       "unit": "slices per person",
       "less": "Fewer slices",
       "more": "More slices",
-      "rule": "Little < normal < very hungry. Limits keep this order.",
+      "rule": "Neighboring appetites adjust automatically to keep their order.",
       "next": "Set appetite"
     }
   },
@@ -422,7 +426,7 @@ export const messages = {
       "confirm": "Confirmer le vote",
       "handoff": "Passez le téléphone",
       "ready": "Au tour de la personne suivante !",
-      "start": "Je suis prêt",
+      "start": "C’est moi",
       "voted": "votes confirmés",
       "drag": "Glisser pour réordonner",
       "up": "Monter",
@@ -430,7 +434,7 @@ export const messages = {
       "finished": "Commande décidée !",
       "finishHint": "Même nombre de pizzas. Saveurs choisies ensemble.",
       "method": "Comment les saveurs sont-elles choisies ?",
-      "methodText": "Chaque personne a une voix de même poids. Pour une seule portion, la saveur la moins soutenue est éliminée et ses voix passent à la préférence suivante jusqu’à une majorité. Pour plusieurs portions, nous adaptons le vote proportionnel : chaque portion consomme un quota égal au nombre de personnes divisé par le nombre de portions. Le poids restant reste actif et passe à la préférence suivante si sa saveur est éliminée. Une saveur peut recevoir plusieurs portions.",
+      "methodText": "Le poids du vote correspond aux parts de chaque personne. Pour une portion, le goût le moins soutenu est éliminé et les préférences sont transférées jusqu’à la majorité du poids. Pour plusieurs portions, chaque portion consomme un quota : poids total divisé par portions. Seul le poids restant est transféré. Un goût peut recevoir plusieurs portions.",
       "tieText": "Les égalités utilisent les résultats précédents, puis un ordre tiré au sort et fixé au début du vote.",
       "tieOrder": "Ordre tiré au sort",
       "eliminated": "Éliminée",
@@ -442,7 +446,9 @@ export const messages = {
       "resultSummary": "Saveurs élues",
       "voteProgress": "Vote",
       "privacy": "Seul le classement de la personne actuelle est affiché.",
-      "whole": "Entière"
+      "whole": "Entière",
+      "voteWeight": "Poids du vote",
+      "yourTurn": "Qui va voter ?"
     },
     "baseline": {
       "title": "Quelle faim avez-vous ?",
@@ -452,7 +458,7 @@ export const messages = {
       "unit": "parts par personne",
       "less": "Moins de parts",
       "more": "Plus de parts",
-      "rule": "Petite < normale < grande faim. Les limites préservent cet ordre.",
+      "rule": "Les niveaux voisins s’ajustent automatiquement pour rester dans l’ordre.",
       "next": "Régler la faim"
     }
   },
@@ -572,7 +578,7 @@ export const messages = {
       "confirm": "Confirmar voto",
       "handoff": "Pasa el móvil",
       "ready": "¡Le toca a la siguiente persona!",
-      "start": "Estoy listo",
+      "start": "Soy yo",
       "voted": "votos confirmados",
       "drag": "Arrastrar para ordenar",
       "up": "Subir",
@@ -580,7 +586,7 @@ export const messages = {
       "finished": "¡Pedido decidido!",
       "finishHint": "La misma cantidad de pizzas. Sabores elegidos entre todos.",
       "method": "¿Cómo se eligieron los sabores?",
-      "methodText": "Cada persona tiene un voto de igual peso. Para una sola porción, se elimina el sabor con menos apoyo y sus votos pasan a la siguiente preferencia hasta lograr mayoría. Para varias porciones usamos una adaptación proporcional: cada porción consume una cuota igual al número de personas dividido por las porciones. El peso restante sigue activo y pasa a la siguiente preferencia al eliminar su sabor. Un sabor puede recibir varias porciones.",
+      "methodText": "El peso de cada voto corresponde a las porciones de esa persona. Para una sola porción, se elimina el sabor menos apoyado y se transfieren las preferencias hasta alcanzar la mayoría del peso. Para varias porciones, cada porción consume una cuota: peso total dividido entre porciones. Solo se transfiere el peso restante. Un sabor puede recibir varias porciones.",
       "tieText": "Los empates usan los recuentos anteriores y después un orden sorteado y fijado al comenzar.",
       "tieOrder": "Orden sorteado",
       "eliminated": "Eliminado",
@@ -592,7 +598,9 @@ export const messages = {
       "resultSummary": "Sabores elegidos",
       "voteProgress": "Votación",
       "privacy": "Solo se muestra el ranking de la persona actual.",
-      "whole": "Entera"
+      "whole": "Entera",
+      "voteWeight": "Peso del voto",
+      "yourTurn": "¿Quién va a votar?"
     },
     "baseline": {
       "title": "¿Cuánta hambre tienen?",
@@ -602,7 +610,7 @@ export const messages = {
       "unit": "porciones por persona",
       "less": "Menos porciones",
       "more": "Más porciones",
-      "rule": "Poca < normal < mucha hambre. Los límites mantienen este orden.",
+      "rule": "Los niveles vecinos se ajustan automáticamente para mantener el orden.",
       "next": "Ajustar hambre"
     }
   },
@@ -722,7 +730,7 @@ export const messages = {
       "confirm": "确认投票",
       "handoff": "把手机交给下一位",
       "ready": "下一位，轮到你了！",
-      "start": "我准备好了",
+      "start": "是我",
       "voted": "票已确认",
       "drag": "拖动排序",
       "up": "上移",
@@ -730,7 +738,7 @@ export const messages = {
       "finished": "订单决定好了！",
       "finishHint": "披萨数量不变，口味由大家决定。",
       "method": "口味是如何选出的？",
-      "methodText": "每个人的投票权重相同。只有一份时，逐轮淘汰票数最少的口味，将其选票转移到下一偏好，直到获得多数。多份时采用比例分配的改编规则：每份消耗的配额为人数除以总份数。剩余投票权重继续有效；某口味被淘汰时，权重转移到下一偏好。一种口味可以分得多份。",
+      "methodText": "每人的投票权重等于其预计食用的片数。只有一份时，淘汰支持最少的口味并转移偏好，直到获得权重多数。分配多份时，每份消耗的配额为总权重除以总份数，只有剩余权重继续转移，同一口味可获得多份。",
       "tieText": "平票时参考之前各轮的支持度；仍然相同时，使用投票开始时固定的随机顺序。",
       "tieOrder": "抽签顺序",
       "eliminated": "已淘汰",
@@ -742,7 +750,9 @@ export const messages = {
       "resultSummary": "选出的口味",
       "voteProgress": "投票",
       "privacy": "只显示当前投票者的排序。",
-      "whole": "整张"
+      "whole": "整张",
+      "voteWeight": "投票权重",
+      "yourTurn": "轮到谁投票？"
     },
     "baseline": {
       "title": "大家的食量是多少？",
@@ -752,7 +762,7 @@ export const messages = {
       "unit": "片／人",
       "less": "减少片数",
       "more": "增加片数",
-      "rule": "小食量 < 正常 < 大食量。按钮限制确保顺序。",
+      "rule": "相邻食量会自动调整，始终保持递增。",
       "next": "设置食量"
     }
   }
