@@ -110,9 +110,9 @@ Antes do **primeiro voto** e entre todas as pessoas, a tela mostra uma carinha g
 
 <img src="docs/screenshots/new-16-first-voter.png" width="360" alt="Identificação antes do primeiro voto: Pessoa 01, pouca fome, peso de 3 fatias">
 
-Coloque o sabor favorito no topo. Arraste pela alça ou toque nos botões de subir e descer. A ordem inicial é embaralhada para cada pessoa. Antes ou durante o voto, toque em **Sou veggie/vegan** para identificar a restrição daquela pessoa. O ranking passa a mostrar apenas os sabores com folhinha; as demais pessoas podem votar em todos os sabores. Se nenhum sabor compatível estiver marcado, confirmar fica bloqueado e **Editar sabores** volta ao cadastro, reiniciando os votos e preservando as marcações das pessoas.
+Coloque o sabor favorito no topo. Arraste pela alça ou toque nos botões de subir e descer. A ordem inicial é embaralhada para cada pessoa. Antes ou durante o voto, toque em **Sou veggie/vegan** para identificar a preferência alimentar daquela pessoa. **Todas as pessoas podem votar em todos os sabores**, inclusive nos não marcados. A identificação não esconde sabores nem altera a ordem escolhida; ela orienta a reserva de pizzas veggie/vegan. Se nenhum sabor compatível estiver marcado, confirmar fica bloqueado e **Editar sabores** volta ao cadastro, reiniciando os votos e preservando as marcações das pessoas.
 
-<img src="docs/screenshots/new-19-veggie-vote.png" width="360" alt="Pessoa veggie/vegan votando apenas nos sabores compatíveis">
+<img src="docs/screenshots/new-19-veggie-vote.png" width="360" alt="Pessoa veggie/vegan votando em todos os sabores disponíveis">
 
 <img src="docs/screenshots/new-06-vote.png" width="360" alt="Ranking individual de sabores com controles de ordenação">
 
@@ -213,8 +213,8 @@ Quando há sabores com folhinha, a apuração acontece em dois grupos:
 
 1. A fome das pessoas veggie/vegan e das pessoas sem restrição que colocaram um sabor marcado em primeiro lugar forma a demanda veggie/vegan.
 2. Reservamos `teto(demanda veggie / fatias por pizza)` pizzas inteiras desse grupo, com mínimo de **uma pizza** quando existe algum sabor marcado e máximo igual ao total do pedido. Se todos preferem esse grupo ou o menu inteiro é marcado, todas as pizzas são veggie/vegan.
-3. Cada pessoa participa da apuração do grupo de sua primeira preferência compatível, com o peso da sua fome. Dentro dele, usamos seu ranking filtrado. Se o pedido inteiro ficar veggie/vegan, todos votam nesse grupo. Se a reserva mínima existir sem apoiadores iniciais, os rankings veggie/vegan de todos escolhem essa pizza.
-4. As demais pizzas seguem os rankings das pessoas sem restrição que preferiram sabores não marcados. A montagem de inteiras, duplas, triplas e quartetos acontece separadamente por grupo, conservando todas as porções e o total calculado.
+3. Cada pessoa participa da apuração do grupo de sua primeira preferência, com o peso da sua fome, independentemente da identificação veggie/vegan. Dentro dele, usamos os sabores desse grupo na ordem do ranking. Uma pessoa veggie/vegan que prefira um sabor normal também influencia a escolha das pizzas normais. Se o pedido inteiro ficar veggie/vegan, todos votam nesse grupo. Se a reserva mínima existir sem apoiadores iniciais, os rankings veggie/vegan de todos escolhem essa pizza.
+4. As demais pizzas seguem os rankings de todas as pessoas que preferiram sabores não marcados. A montagem de inteiras, duplas, triplas e quartetos acontece separadamente por grupo, conservando todas as porções e o total calculado.
 
 Exemplo: uma pessoa veggie/vegan com fome de 7 fatias e outra sem restrição com fome de 3 precisam de duas pizzas normais. Pelo menos uma será inteiramente veggie/vegan, mesmo se a outra pessoa preferir carne. Se o pedido couber em uma única pizza, ela será totalmente veggie/vegan, e a pessoa sem restrição também participa da escolha entre os sabores compatíveis.
 
@@ -327,10 +327,10 @@ npm test
 npm run build
 ```
 
-Os **33 testes automatizados** cobrem:
+Os **34 testes automatizados** cobrem:
 
 - Inicialização e persistência de lista vazia, preservando grupos existentes.
-- Reserva pela fome, votos sem restrição em sabores veggie/vegan, pedido de uma pizza, menu totalmente marcado, falta de opção compatível e separação dos grupos nas quatro divisões.
+- Reserva pela fome, votos em qualquer sabor independentemente da identificação veggie/vegan, pedido de uma pizza, menu totalmente marcado, falta de opção compatível e separação dos grupos nas quatro divisões.
 - Cálculo nos três tamanhos, até 50 pessoas, níveis individuais e grupos mistos.
 - Referências personalizadas, cascatas nos dois sentidos, mínimo 1 / 2 / 3, aumentos acima de 99, ordem estrita, dados inválidos e migração.
 - Transferência de preferências, maioria ponderada, distribuição proporcional, consumo do peso, invariância de escala, pesos inválidos e desempates reproduzíveis.
@@ -338,6 +338,8 @@ Os **33 testes automatizados** cobrem:
 - Frações 1/3 e 2/3, agrupamento de pizzas inteiras com seus restos e pedidos grandes com referências personalizadas.
 
 A revisão desta mudança no Chromium conferiu 360×800, 768×1024 e 1280×900 nos temas claro e escuro, além da votação em 844×390; lista vazia, adição central, remoção até zero após cálculo, persistência, marcação pelo teclado, X independente, restrição individual, bloqueio sem sabor compatível, volta ao cadastro, votação completa e exportação PNG. Capturas atualizadas: `new-17` a `new-22`.
+
+A revisão do ajuste de espaçamento conferiu cadastro, ranking e resultado em 360×800, 768×1024 e 1280×900, nos dois temas. Os textos de orientação têm 16px de distância dos cards. Também foi validado que alternar a identificação veggie/vegan mantém todos os sabores e a ordem do voto.
 
 A revisão anterior no Chromium incluiu 360×800, 768×1024, 568×320, 844×390, 1280×720 e 1280×900; temas claro/escuro; textos do novo passo nos cinco idiomas; limites dos seletores; persistência; rotação; recálculo; grupo com 50 pessoas; teclado nas quatro divisões; identificação antes do primeiro voto e entre pessoas com fomes distintas; votação ponderada completa em terços; exportação e download do PNG. As capturas publicadas estão em `docs/screenshots/`. Evidências adicionais e arquivos temporários em `output/` ficam fora do Git.
 

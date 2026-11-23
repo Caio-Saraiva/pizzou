@@ -155,3 +155,14 @@ test('all-veggie menus support a single compatible candidate and everyone is cou
   assert.equal(plan.allocations.reduce((sum,a)=>sum+a.units,0),4);
   assert.deepEqual(allocateFlavors([['a']],['a'],1,3).allocations,[{id:'a',units:3}]);
 });
+
+test('veggie identity reserves capacity while normal first preferences still elect normal flavors', () => {
+  const flavors=[{id:'v',veggie:true},{id:'c'},{id:'d'}];
+  for(const parts of [1,2,3,4]) {
+    const plan=allocateDietaryFlavors([['c','v','d'],['d','c','v']],flavors,2,parts,9,[7,3],[true,false],8);
+    assert.equal(plan.veggiePizzaCount,1);
+    assert.equal(plan.veggieDemand,7);
+    assert.ok(plan.allocations.some(a=>a.id==='c'));
+    assert.equal(plan.pizzas.reduce((sum,g)=>sum+g.count,0),2);
+  }
+});

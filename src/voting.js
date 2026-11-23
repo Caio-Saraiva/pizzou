@@ -84,7 +84,7 @@ export function fraction(units, parts) {
 export const escapeHtml = value => String(value).replace(/[&<>"']/g, char => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[char]));
 
 // First reserve whole pizzas by dietary demand, then count preferences inside
-// each compatible pool. Appetite is assigned by the first compatible choice;
+// each flavor pool. Votes follow the first choice, independently of identity;
 // an otherwise unsupported mandatory veggie pizza uses everyone’s veggie ranking.
 export function allocateDietaryFlavors(ballots, flavors, pizzaCount, parts, seed, weights, dietary, slices) {
   const ids = flavors.map(f => f.id);
@@ -96,15 +96,15 @@ export function allocateDietaryFlavors(ballots, flavors, pizzaCount, parts, seed
     if (dietary.some(Boolean)) throw Error('Missing veggie flavors');
     return baseline;
   }
-  const prefersVeg = ballots.map((ranking, i) => dietary[i] || veg.includes(ranking[0]));
-  const vegDemand = weights.reduce((sum, w, i) => sum + (prefersVeg[i] ? w : 0), 0);
+  const prefersVeg = ballots.map(ranking => veg.includes(ranking[0]));
+  const vegDemand = weights.reduce((sum, w, i) => sum + (dietary[i] || prefersVeg[i] ? w : 0), 0);
   const vegCount = other.length && !prefersVeg.every(Boolean) ? Math.min(pizzaCount, Math.max(1, Math.ceil(vegDemand / slices))) : pizzaCount;
   const allocations = [], rounds = [], pizzas = [], tieOrder = [];
   for (const [pool, count, isVeg] of [[veg, vegCount, true], [other, pizzaCount - vegCount, false]]) {
     if (!count) continue;
     let voters = ballots.map((_, i) => i).filter(i => prefersVeg[i] === isVeg);
     // A rounded-up shared order can consist entirely of veggie pizzas.
-    if (count === pizzaCount || !voters.length) voters = ballots.map((_, i) => i).filter(i => isVeg || !dietary[i]);
+    if (count === pizzaCount || !voters.length) voters = ballots.map((_, i) => i);
     const plan = allocateFlavors(voters.map(i => ballots[i].filter(id => pool.includes(id))), pool, count, parts, seed, voters.map(i => weights[i]));
     allocations.push(...plan.allocations); rounds.push(...plan.rounds); pizzas.push(...plan.pizzas); tieOrder.push(...plan.tieOrder);
   }

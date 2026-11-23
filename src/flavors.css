@@ -169,6 +169,8 @@
 .veggie-badge { display: inline-flex; vertical-align: middle; color: var(--veggie); flex-shrink: 0; }
 .veggie-badge .icon { width: 18px; height: 18px; }
 .fl-veggie-hint, .fl-veggie-note { display: flex; align-items: center; gap: 7px; color: var(--muted); font-size: 12px; line-height: 1.5; }
+.fl-veggie-hint { margin-block: 16px 8px; }
+.fl-veggie-note { margin-block: 16px 8px; }
 .fl-veggie-hint .icon, .fl-veggie-note .icon { color: var(--veggie); flex-shrink: 0; }
 .dietary-toggle { display: flex; align-items: center; justify-content: center; gap: 9px; min-height: 46px; padding: 9px 14px; border: 1px solid var(--line); border-radius: 14px; background: var(--soft); color: var(--muted); cursor: pointer; flex-shrink: 0; transition: background .2s, border-color .2s, color .2s; }
 .dietary-toggle.is-veggie { color: var(--veggie); border-color: var(--veggie); background: var(--veggie-soft); }
